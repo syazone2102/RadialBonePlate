@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Plate Calculator - Section 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        .blueprint-bg {
+            background-color: #f8fafc;
+            background-image: linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes pulse-danger {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .pulse-red {
+            animation: pulse-danger 2s infinite;
+            border-color: #ef4444;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
+
+    <div class="max-w-6xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
+
+        <header class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white p-6 md:p-8 relative">
+            <h1 class="text-3xl font-extrabold tracking-tight">Radial Plate Calculator</h1>
+            <p class="text-sm mt-2 text-indigo-200 font-medium uppercase tracking-widest">Section 3: FEA Stability &
+                Micromotion Predictor</p>
+        </header>
+
+        <div class="p-6 md:p-10 relative">
+
+            <div
+                class="mb-8 p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between shadow-inner">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <p class="text-sm font-bold text-slate-700" id="statusInheritance">Importing Pipeline Data...</p>
+                </div>
+                <input type="hidden" id="sysMass" value="70">
+                <input type="hidden" id="sysMultiplier" value="1.0">
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                <div class="lg:col-span-5 space-y-6">
+
+                    <div
+                        class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group">
+                        <div
+                            class="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full -z-10 transition-all group-hover:scale-110">
+                        </div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">In Vivo Patient Force
+                        </p>
+                        <p class="text-5xl font-black text-slate-800 drop-shadow-sm"><span id="outForce">0</span><span
+                                class="text-2xl font-bold text-slate-400 ml-2">N</span></p>
+
+                        <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded text-xs text-slate-600">
+                            <strong>What is In Vivo Force?</strong><br>
+                            This is the actual physical load inside the living body. To stabilize the wrist, muscles
+                            like the brachioradialis contract forcefully. This acts as a lever, generating internal
+                            compressive and bending forces that are often 3 to 5 times greater than standard gravity.
+                            The load multiplier mathematically scales your data to simulate this.
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-sm font-bold text-indigo-900 uppercase tracking-wide">"What-If" Engine</h2>
+                            <span class="px-2 py-1 bg-indigo-200 text-indigo-800 text-[10px] font-bold rounded">Live
+                                Override</span>
+                        </div>
+
+                        <label class="block text-sm font-bold text-indigo-800 mb-2">Adjust Plate Thickness</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" id="inputThick" min="1.5" max="6.0" step="0.1" value="2.5"
+                                class="w-full accent-indigo-600 cursor-pointer" oninput="runFEAPrediction()">
+                            <span class="text-2xl font-black text-indigo-700 w-16 text-right"><span
+                                    id="valThick">2.5</span><span class="text-xs font-normal ml-1">mm</span></span>
+                        </div>
+                        <p class="text-[10px] text-indigo-600 mt-3 font-medium">Bending stiffness increases cubically
+                            ($h^3$) with plate thickness. Adjust to dynamically reduce micromotion.</p>
+                    </div>
+
+                </div>
+
+                <div class="lg:col-span-7 space-y-6">
+
+                    <div id="resultCard"
+                        class="bg-white border-2 border-slate-200 rounded-xl shadow-md overflow-hidden transition-all duration-500">
+
+                        <div class="flex flex-col md:flex-row">
+                            <div
+                                class="w-full md:w-1/2 blueprint-bg p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 relative h-64">
+                                <p class="absolute top-3 left-3 text-[10px] font-bold text-slate-500 uppercase">Fracture
+                                    Gap Simulation</p>
+
+                                <svg width="100%" height="120" viewBox="0 0 200 100" class="mt-4">
+                                    <rect x="20" y="20" width="160" height="15" fill="#64748b" rx="2" />
+                                    <path d="M 20 35 L 90 35 C 95 35, 95 90, 90 90 L 20 90 Z" fill="#cbd5e1" />
+                                    <path id="boneRight"
+                                        d="M 110 35 L 180 35 L 180 90 L 110 90 C 105 90, 105 35, 110 35 Z"
+                                        fill="#cbd5e1" class="transition-all duration-300" />
+                                    <line id="gapLine" x1="90" y1="60" x2="110" y2="60" stroke="#ef4444"
+                                        stroke-width="2" stroke-dasharray="2,2" class="transition-all duration-300" />
+                                </svg>
+                            </div>
+
+                            <div
+                                class="w-full md:w-1/2 p-6 flex flex-col justify-center items-center text-center bg-slate-50">
+                                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Predicted
+                                    Micromotion</p>
+                                <p class="text-6xl font-black drop-shadow-md text-slate-800" id="outDispText"><span
+                                        id="outDisp">0.00</span><span class="text-xl font-bold ml-1">mm</span></p>
+                                <div id="statusBadge"
+                                    class="mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest bg-slate-200 text-slate-600 transition-colors">
+                                    Calculating...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-white border-t border-slate-200 text-xs text-slate-600">
+                            <strong>What is Micromotion?</strong> It is the microscopic movement between bone fragments.
+                            <ul class="mt-1 list-disc pl-5">
+                                <li><strong>0.2mm - 1.0mm:</strong> Stimulates stem cells to form a biological callus
+                                    (Faster Healing).</li>
+                                <li><strong>> 2.0mm:</strong> Fragments shift too much, tearing delicate blood vessels.
+                                    High risk of Non-Union.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg">
+                        <div class="bg-slate-900 p-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h2 class="text-sm font-bold text-white uppercase tracking-wider">Clinical Recommendations
+                            </h2>
+                        </div>
+                        <div class="p-5 text-slate-300">
+                            <ul id="recList" class="space-y-3 text-sm font-medium leading-relaxed">
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-50 p-6 border-t border-slate-200 flex justify-between items-center">
+            <button onclick="window.location.href='section2.html'"
+                class="px-6 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 shadow-sm hover:bg-slate-100 transition-all flex items-center gap-2">
+                &larr; Return to Section 2
+            </button>
+            <button onclick="window.location.href='section4.html'"
+                class="px-8 py-3 rounded-xl font-bold text-white bg-indigo-600 shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all flex items-center gap-2">
+                Proceed to Section 4
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const FEA_BASE_DISP = 8.255;
+        const FEA_REF_LOAD = 500;
+        const BASE_PLATE_THICKNESS = 2.5;
+        const CLINICAL_LIMIT = 2.0;
+
+        function initializeData() {
+            let mass = localStorage.getItem('plate_mass') || 70;
+            let multiplier = localStorage.getItem('plate_multiplier') || 1.0;
+            let thick = localStorage.getItem('plate_thick') || 2.5;
+
+            document.getElementById('sysMass').value = mass;
+            document.getElementById('sysMultiplier').value = multiplier;
+            document.getElementById('inputThick').value = thick;
+
+            const statusEl = document.getElementById('statusInheritance');
+            if (localStorage.getItem('plate_multiplier')) {
+                statusEl.innerText = `Pipeline Active: Connected to Section 1 & 2.`;
+                statusEl.className = "text-sm font-bold text-emerald-600";
+            } else {
+                statusEl.innerText = "Standalone Mode (Default values applied).";
+                statusEl.className = "text-sm font-bold text-amber-500";
+            }
+
+            runFEAPrediction();
+        }
+
+        function runFEAPrediction() {
+            let mass = parseFloat(document.getElementById('sysMass').value);
+            let multiplier = parseFloat(document.getElementById('sysMultiplier').value);
+            let thick = parseFloat(document.getElementById('inputThick').value);
+
+            document.getElementById('valThick').innerText = thick.toFixed(1);
+
+            // 1. Calculate Force
+            let force = mass * 9.81 * multiplier;
+            document.getElementById('outForce').innerText = force.toFixed(0);
+
+            // 2. Calculate Micromotion using CUBIC SCALING for bending stiffness
+            let forceFactor = force / FEA_REF_LOAD;
+            let thicknessFactor = Math.pow((BASE_PLATE_THICKNESS / thick), 3);
+            let predictedDisp = FEA_BASE_DISP * forceFactor * thicknessFactor;
+
+            document.getElementById('outDisp').innerText = predictedDisp.toFixed(2);
+
+            updateCDSS(predictedDisp, thick);
+            updateVisualizer(predictedDisp);
+        }
+
+        function updateVisualizer(disp) {
+            const boneRight = document.getElementById('boneRight');
+            const gapLine = document.getElementById('gapLine');
+
+            // Limit visual shift so it doesn't break out of the SVG box
+            let visualShift = Math.min(disp * 3, 50);
+            let newX = 110 + visualShift;
+
+            boneRight.setAttribute('d', `M ${newX} 35 L ${newX + 70} 35 L ${newX + 70} 90 L ${newX} 90 C ${newX - 5} 90, ${newX - 5} 35, ${newX} 35 Z`);
+            gapLine.setAttribute('x2', newX);
+
+            if (disp > CLINICAL_LIMIT) {
+                gapLine.setAttribute('stroke', '#ef4444');
+            } else if (disp > 1.0) {
+                gapLine.setAttribute('stroke', '#f59e0b');
+            } else {
+                gapLine.setAttribute('stroke', '#22c55e');
+            }
+        }
+
+        function updateCDSS(disp, thick) {
+            const card = document.getElementById('resultCard');
+            const text = document.getElementById('outDispText');
+            const badge = document.getElementById('statusBadge');
+            const list = document.getElementById('recList');
+
+            list.innerHTML = '';
+
+            if (disp <= 1.0) {
+                card.className = "bg-emerald-50 border-2 border-emerald-400 rounded-xl shadow-md overflow-hidden transition-all duration-500";
+                text.className = "text-6xl font-black drop-shadow-md text-emerald-700";
+                badge.className = "mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest bg-emerald-200 text-emerald-800 transition-colors";
+                badge.innerText = "Optimal Callus Formation";
+
+                list.innerHTML += `<li class="flex items-start"><span class="text-emerald-400 mr-3">✓</span> <strong>Clearance:</strong> Construct is mechanically sound. Biological healing is highly supported.</li>`;
+                list.innerHTML += `<li class="flex items-start"><span class="text-emerald-400 mr-3">✓</span> <strong>Action:</strong> Proceed with ${thick.toFixed(1)}mm custom plate fabrication.</li>`;
+
+            } else if (disp <= CLINICAL_LIMIT) {
+                card.className = "bg-amber-50 border-2 border-amber-400 rounded-xl shadow-md overflow-hidden transition-all duration-500";
+                text.className = "text-6xl font-black drop-shadow-md text-amber-700";
+                badge.className = "mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest bg-amber-200 text-amber-800 transition-colors";
+                badge.innerText = "Borderline Micromotion";
+
+                list.innerHTML += `<li class="flex items-start"><span class="text-amber-400 mr-3">⚠</span> <strong>Caution:</strong> Displacement is elevated but remains biologically viable.</li>`;
+                list.innerHTML += `<li class="flex items-start"><span class="text-indigo-400 mr-3">➔</span> <strong>Recommendation:</strong> Consider increasing plate thickness slightly via the What-If slider.</li>`;
+
+            } else {
+                card.className = "bg-red-50 border-2 border-red-500 rounded-xl shadow-lg overflow-hidden transition-all duration-500 pulse-red";
+                text.className = "text-6xl font-black drop-shadow-md text-red-700";
+                badge.className = "mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest bg-red-600 text-white shadow-md transition-colors";
+                badge.innerText = "Danger: Non-Union Risk";
+
+                list.innerHTML += `<li class="flex items-start"><span class="text-red-400 mr-3">❌</span> <strong>Mechanical Failure:</strong> Force will shear healing tissue, risking non-union.</li>`;
+                list.innerHTML += `<li class="flex items-start"><span class="text-indigo-400 mr-3">➔</span> <strong>Primary Action:</strong> Increase Plate Thickness until warning clears.</li>`;
+                list.innerHTML += `<li class="flex items-start"><span class="text-indigo-400 mr-3">➔</span> <strong>Secondary Action:</strong> If max thickness is reached, patient activity MUST be clinically restricted.</li>`;
+            }
+        }
+
+        window.onload = initializeData;
+    </script>
+</body>
+
+</html>

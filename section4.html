@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Plate Calculator - Section 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        /* Interactive SVG Zone Styles */
+        .anatomy-zone {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .anatomy-zone:hover {
+            opacity: 0.8;
+            filter: brightness(1.2);
+        }
+
+        .zone-active {
+            stroke: #4f46e5;
+            stroke-width: 3px;
+            filter: brightness(1.1);
+        }
+
+        @keyframes pulse-line {
+            0% {
+                stroke-opacity: 0.5;
+                stroke-width: 2;
+            }
+
+            50% {
+                stroke-opacity: 1;
+                stroke-width: 4;
+            }
+
+            100% {
+                stroke-opacity: 0.5;
+                stroke-width: 2;
+            }
+        }
+
+        .watershed-line {
+            animation: pulse-line 2s infinite;
+            cursor: pointer;
+        }
+
+        .watershed-line:hover {
+            stroke: #ef4444;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
+
+    <div class="max-w-6xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200"
+        id="printArea">
+
+        <header
+            class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 md:p-8 relative print:bg-white print:text-black print:border-b-2">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">Radial Plate Calculator</h1>
+                    <p class="text-sm mt-2 text-slate-300 font-medium uppercase tracking-widest print:text-slate-600">
+                        Section 4: Surgical Guide & Methodology</p>
+                </div>
+                <div class="text-right text-xs font-bold text-slate-400 bg-slate-900/50 p-2 rounded print:hidden">
+                    Module 4 of 4
+                </div>
+            </div>
+        </header>
+
+        <div class="p-6 md:p-10 relative">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+                <div class="space-y-6 print:break-inside-avoid">
+                    <h2 class="text-xl font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                            </path>
+                        </svg>
+                        Implant Placement Zone
+                    </h2>
+                    <p class="text-sm text-slate-500 mb-4">Click the anatomical zones on the diagram to review critical
+                        surgical placement guidelines for the customized locking plate.</p>
+
+                    <div
+                        class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex justify-center shadow-inner relative">
+                        <svg width="300" height="400" viewBox="0 0 200 300" class="drop-shadow-md">
+                            <path
+                                d="M 60 300 C 60 200, 40 100, 30 20 C 60 10, 140 10, 170 20 C 160 100, 140 200, 140 300 Z"
+                                fill="#e2e8f0" stroke="#94a3b8" stroke-width="2" />
+
+                            <path id="zoneVolar" onclick="activateZone('volar')"
+                                d="M 60 250 C 50 150, 45 80, 45 50 C 80 45, 120 45, 155 50 C 155 80, 150 150, 140 250 Z"
+                                fill="#cbd5e1" class="anatomy-zone" stroke="transparent" />
+
+                            <path id="zoneStyloid" onclick="activateZone('styloid')"
+                                d="M 30 20 C 20 40, 35 60, 45 50 C 45 30, 40 20, 30 20 Z" fill="#94a3b8"
+                                class="anatomy-zone" stroke="transparent" />
+
+                            <path id="zoneWatershed" onclick="activateZone('watershed')" d="M 35 35 Q 100 60 165 35"
+                                fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="4,4"
+                                class="watershed-line anatomy-zone" />
+
+                            <text x="100" y="150" text-anchor="middle" fill="#64748b" font-size="12" font-weight="bold"
+                                class="pointer-events-none uppercase tracking-widest opacity-50">Radial Shaft</text>
+                        </svg>
+
+                        <div
+                            class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded shadow text-[10px] font-bold text-slate-500 uppercase">
+                            Volar View (Palmar)
+                        </div>
+                    </div>
+
+                    <div id="detailCard"
+                        class="bg-white border-l-4 border-indigo-500 shadow-md rounded-r-xl p-5 min-h-[120px] transition-all flex flex-col justify-center">
+                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Select a Zone</p>
+                        <p class="text-sm text-slate-600 font-medium leading-relaxed">Interact with the anatomical
+                            diagram above to display surgical limits and critical soft-tissue considerations.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 print:break-inside-avoid">
+                    <h2 class="text-xl font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Prediction Methodology
+                    </h2>
+
+                    <div
+                        class="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm text-sm text-slate-700 space-y-4">
+                        <p>This calculator operates as a Clinical Decision Support System (CDSS). The prediction engine
+                            relies on scaling empirical Finite Element Analysis (FEA) data to patient-specific dynamic
+                            loads.</p>
+
+                        <div class="bg-white p-4 rounded border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-2 border-b pb-1">1. The FEA Baseline</h3>
+                            <p class="text-xs">The system anchors on an extracted FEA reference datum indicating a
+                                maximum nodal displacement of <strong>8.255 mm</strong> under a standardized <strong>500
+                                    N</strong> physiological load, utilizing a standard 2.5 mm Ti-6Al-4V construct.</p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-2 border-b pb-1">2. Force Scaling (Linear)</h3>
+                            <p class="text-xs">Assuming the Titanium alloy and cortical bone remain within their linear
+                                elastic limits, in vivo force is calculated as a product of patient mass, gravity, and
+                                the UCLA activity multiplier (dynamic shock load).</p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-2 border-b pb-1">3. Stiffness Scaling (Cubic)</h3>
+                            <p class="text-xs">To accurately simulate customized plate thickness, the engine applies the
+                                structural engineering principle of the Area Moment of Inertia ($I = \frac{bh^3}{12}$).
+                                Bending resistance increases cubically ($h^3$) with plate thickness, exponentially
+                                reducing predicted micromotion.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-indigo-900 text-white p-6 rounded-xl shadow-lg relative overflow-hidden print:hidden">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-700 rounded-full opacity-50"></div>
+                        <h3 class="font-bold text-lg mb-1 relative z-10">Thesis Architecture Complete</h3>
+                        <p class="text-xs text-indigo-200 mb-4 relative z-10">All 4 modules are integrated and
+                            operational. The system is ready for panel demonstration.</p>
+
+                        <div class="flex gap-2">
+                            <span
+                                class="px-2 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold rounded uppercase border border-green-500/30">Sec
+                                1: Forces ✓</span>
+                            <span
+                                class="px-2 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold rounded uppercase border border-green-500/30">Sec
+                                2: Sizing ✓</span>
+                            <span
+                                class="px-2 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold rounded uppercase border border-green-500/30">Sec
+                                3: FEA ✓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-50 p-6 border-t border-slate-200 flex justify-between items-center print:hidden">
+            <button onclick="window.location.href='section3.html'"
+                class="px-6 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 shadow-sm hover:bg-slate-100 transition-all flex items-center gap-2">
+                &larr; Return to Section 3
+            </button>
+            <button onclick="window.print()"
+                class="px-8 py-3 rounded-xl font-bold text-white bg-slate-800 shadow-lg hover:bg-black hover:shadow-xl transition-all flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                    </path>
+                </svg>
+                Generate Final Report (PDF)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const zoneData = {
+            'watershed': {
+                title: 'CRITICAL LIMIT: The Watershed Line',
+                text: 'This is the most distal margin of the flat volar surface. <strong>The customized plate MUST NOT extend past this line.</strong> Placing hardware distal to the watershed line causes severe friction against the Flexor Pollicis Longus (FPL) tendon, leading to tenosynovitis or catastrophic tendon rupture.',
+                color: 'border-red-500',
+                titleColor: 'text-red-600'
+            },
+            'volar': {
+                title: 'TARGET: Optimal Volar Surface',
+                text: 'This is the relatively flat palmar aspect of the distal radius. The customized Ti-6Al-4V locking plate should sit perfectly flush against this cortical surface to ensure maximum bicortical screw purchase and mechanical stability.',
+                color: 'border-emerald-500',
+                titleColor: 'text-emerald-600'
+            },
+            'styloid': {
+                title: 'BOUNDARY: Radial Styloid',
+                text: 'The lateral boundary of the radius. Locking screws directed into the styloid are critical for capturing complex intra-articular fracture fragments. The customized plate width must not overhang this lateral edge.',
+                color: 'border-blue-500',
+                titleColor: 'text-blue-600'
+            }
+        };
+
+        function activateZone(zoneId) {
+            // Reset all zones
+            document.getElementById('zoneWatershed').classList.remove('zone-active');
+            document.getElementById('zoneVolar').classList.remove('zone-active');
+            document.getElementById('zoneStyloid').classList.remove('zone-active');
+
+            // Highlight selected zone
+            const activePath = document.getElementById('zone' + zoneId.charAt(0).toUpperCase() + zoneId.slice(1));
+            activePath.classList.add('zone-active');
+
+            // Update Detail Card
+            const card = document.getElementById('detailCard');
+            const data = zoneData[zoneId];
+
+            // Apply new colors and text
+            card.className = `bg-white border-l-4 ${data.color} shadow-lg rounded-r-xl p-5 min-h-[120px] transition-all flex flex-col justify-center transform scale-105`;
+            card.innerHTML = `
+                <p class="text-xs font-bold ${data.titleColor} uppercase tracking-widest mb-2">${data.title}</p>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">${data.text}</p>
+            `;
+        }
+    </script>
+</body>
+
+</html>

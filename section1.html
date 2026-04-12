@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Plate Calculator - Clinical Wizard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        .step-hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        .step-active {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex items-center justify-center">
+
+    <div class="max-w-4xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
+
+        <header class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-6 md:p-8 relative">
+            <h1 class="text-3xl font-extrabold tracking-tight">Radial Plate Calculator</h1>
+            <p class="text-sm mt-2 text-blue-200 font-medium uppercase tracking-widest">Section 1: Clinical Load
+                Assessment</p>
+
+            <div class="mt-8 bg-slate-700 rounded-full h-2 w-full overflow-hidden">
+                <div id="progressBar" class="bg-blue-400 h-full transition-all duration-500 w-1/4"></div>
+            </div>
+            <div class="flex justify-between text-xs mt-2 text-slate-400 font-bold tracking-wide">
+                <span id="stepIndicator">Step 1 of 4: Demographics</span>
+            </div>
+        </header>
+
+        <div class="p-6 md:p-10 min-h-[400px] relative">
+
+            <div id="step1" class="step-active space-y-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b pb-2">Patient Demographics</h2>
+                <p class="text-sm text-slate-600">Bone Mineral Density (BMD) and mass are critical factors in
+                    determining screw purchase stability and baseline force. Please input the patient's details below.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">Biological Sex</label>
+                        <div class="flex bg-slate-200 p-1 rounded-lg">
+                            <button id="btnMale" onclick="setGender('Male')"
+                                class="flex-1 py-2 text-sm font-bold rounded-md bg-white shadow text-blue-700 transition-all">Male</button>
+                            <button id="btnFemale" onclick="setGender('Female')"
+                                class="flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all">Female</button>
+                        </div>
+                        <input type="hidden" id="inputGender" value="Male">
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-semibold text-slate-700">Age</label>
+                            <span class="text-xl font-bold text-blue-600"><span id="valAge">35</span> yrs</span>
+                        </div>
+                        <input type="range" id="inputAge" min="18" max="90" value="35"
+                            class="w-full accent-blue-600 cursor-pointer" oninput="updateSystem()">
+
+                        <div id="badgeRisk"
+                            class="mt-4 px-3 py-2 rounded text-xs font-bold bg-green-100 text-green-700 text-center transition-all border border-green-200">
+                            Normal Bone Density Expected
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 md:col-span-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-semibold text-slate-700">Patient Mass</label>
+                            <span class="text-xl font-bold text-blue-600"><span id="valMass">70</span> kg</span>
+                        </div>
+                        <input type="range" id="inputMass" min="40" max="140" value="70"
+                            class="w-full accent-blue-600 cursor-pointer" oninput="updateSystem()">
+                    </div>
+                </div>
+            </div>
+
+            <div id="step2" class="step-hidden space-y-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b pb-2">UCLA Activity Scale</h2>
+                <p class="text-sm text-slate-600">Select the number that best represents the patient's typical activity
+                    level. Higher levels introduce dynamic and shock loads to the implant.</p>
+
+                <div class="grid grid-cols-5 md:grid-cols-10 gap-2 mb-6" id="uclaButtons">
+                </div>
+                <input type="hidden" id="inputUCLA" value="4">
+
+                <div
+                    class="bg-indigo-50 border border-indigo-200 p-6 rounded-xl shadow-inner min-h-[120px] flex flex-col justify-center transition-all">
+                    <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-2" id="uclaLabel">Level 4:
+                        Mild Activity</p>
+                    <p id="descUCLA" class="text-lg font-medium text-indigo-900 leading-relaxed">
+                        Routinely walks, shops, or does light chores. Does not participate in moderate or high-impact
+                        activities.
+                    </p>
+                </div>
+            </div>
+
+            <div id="step3" class="step-hidden space-y-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b pb-2">Specific Loading Risks</h2>
+                <p class="text-sm text-slate-600">Select any specific occupational or lifestyle factors that subject the
+                    radius to repetitive strain or high-velocity impact. Each selection increases the load multiplier by
+                    +0.15.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label
+                        class="flex items-start p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all group shadow-sm">
+                        <input type="checkbox" id="chkLabor" class="mt-1 w-5 h-5 accent-blue-600 risk-checkbox"
+                            onchange="updateSystem()">
+                        <div class="ml-4">
+                            <span class="block text-base font-bold text-slate-800 group-hover:text-blue-700">Heavy
+                                Manual Labor</span>
+                            <span class="block text-sm text-slate-500 mt-1">Construction, farming, or industrial
+                                lifting.</span>
+                        </div>
+                    </label>
+
+                    <label
+                        class="flex items-start p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all group shadow-sm">
+                        <input type="checkbox" id="chkWrist" class="mt-1 w-5 h-5 accent-blue-600 risk-checkbox"
+                            onchange="updateSystem()">
+                        <div class="ml-4">
+                            <span
+                                class="block text-base font-bold text-slate-800 group-hover:text-blue-700">Wrist-Loaded
+                                Athletics</span>
+                            <span class="block text-sm text-slate-500 mt-1">Gymnastics, weightlifting, or boxing.</span>
+                        </div>
+                    </label>
+
+                    <label
+                        class="flex items-start p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all group shadow-sm">
+                        <input type="checkbox" id="chkFall" class="mt-1 w-5 h-5 accent-blue-600 risk-checkbox"
+                            onchange="updateSystem()">
+                        <div class="ml-4">
+                            <span
+                                class="block text-base font-bold text-slate-800 group-hover:text-blue-700">High-Velocity
+                                Transport</span>
+                            <span class="block text-sm text-slate-500 mt-1">Motorcycle riding, extreme cycling.</span>
+                        </div>
+                    </label>
+
+                    <label
+                        class="flex items-start p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all group shadow-sm">
+                        <input type="checkbox" id="chkVibe" class="mt-1 w-5 h-5 accent-blue-600 risk-checkbox"
+                            onchange="updateSystem()">
+                        <div class="ml-4">
+                            <span class="block text-base font-bold text-slate-800 group-hover:text-blue-700">Repetitive
+                                Impact</span>
+                            <span class="block text-sm text-slate-500 mt-1">Jackhammer operation, intense racket
+                                sports.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="step4" class="step-hidden space-y-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b pb-2">Load Multiplier Established</h2>
+
+                <div
+                    class="bg-gradient-to-br from-blue-900 to-indigo-900 p-8 rounded-2xl shadow-lg text-center text-white">
+                    <p class="text-sm font-bold uppercase tracking-widest text-blue-200 mb-2">Final Calculated
+                        Multiplier</p>
+                    <p class="text-7xl font-black drop-shadow-md"><span id="outMultiplier">1.10</span><span
+                            class="text-3xl text-blue-300 ml-2">x</span></p>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 text-blue-900">
+                    <h3 class="font-bold text-lg mb-2">What is this Multiplier used for?</h3>
+                    <p class="text-sm leading-relaxed mb-4">
+                        In biomechanical engineering, static finite element analysis (FEA) must be translated into
+                        dynamic real-world conditions. This multiplier acts as the mathematical bridge.
+                    </p>
+                    <div class="bg-white p-4 rounded border border-blue-100 text-sm">
+                        <p id="dynamicSummary" class="font-medium italic text-slate-700">
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-slate-50 p-6 border-t border-slate-200 flex justify-between">
+            <button id="btnPrev" onclick="changeStep(-1)"
+                class="px-6 py-2 rounded-lg font-bold text-slate-600 bg-white border border-slate-300 shadow-sm hover:bg-slate-100 hidden transition-all">
+                &larr; Back
+            </button>
+            <div class="flex-1"></div> <button id="btnNext" onclick="changeStep(1)"
+                class="px-8 py-2 rounded-lg font-bold text-white bg-blue-600 shadow-md hover:bg-blue-700 transition-all">
+                Next Step &rarr;
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. UCLA DATA DICTIONARY ---
+        const uclaData = {
+            1: { title: "Level 1: Wholly Inactive", desc: "Dependent on others. Restricted to bed or chair. Generates minimal biomechanical load." },
+            2: { title: "Level 2: Mostly Inactive", desc: "Restricted to minimum activities of daily living (ADLs). Movement is mostly limited to within the home." },
+            3: { title: "Level 3: Mild Activity (Sometimes)", desc: "Participates in short walks, limited housework, or limited shopping. Generates baseline physiological forces." },
+            4: { title: "Level 4: Mild Activity (Regularly)", desc: "Routinely walks, shops, or does light chores. Standard baseline activity without moderate exertion." },
+            5: { title: "Level 5: Moderate Activity (Sometimes)", desc: "Occasional swimming, unlimited housework, or moderate exertion. Muscle contraction forces begin to rise." },
+            6: { title: "Level 6: Moderate Activity (Regularly)", desc: "Routine moderate exertion. The patient regularly subjects their joints to sustained movement." },
+            7: { title: "Level 7: Active Events (Low Impact)", desc: "Regular participation in activities like bicycling. Raises heart rate but avoids heavy bone impact." },
+            8: { title: "Level 8: Active Events (Moderate Impact)", desc: "Regular participation in activities like golf or bowling. Introduces mild dynamic torsion to the radius." },
+            9: { title: "Level 9: Impact Sports (Sometimes)", desc: "Occasional participation in jogging, tennis, or heavy manual labor. High muscle force and shock loading." },
+            10: { title: "Level 10: Impact Sports (Regularly)", desc: "Routine high stress, heavy lifting, or high-impact athletic forces. Maximum predicted mechanical load on the implant." }
+        };
+
+        // --- 2. WIZARD STATE MANAGEMENT ---
+        let currentStep = 1;
+        const totalSteps = 4;
+        const stepTitles = ["Demographics", "UCLA Activity Scale", "Specific Risks", "Multiplier Established"];
+
+        function changeStep(dir) {
+            // Hide current step
+            document.getElementById(`step${currentStep}`).className = "step-hidden";
+
+            // Update step counter
+            currentStep += dir;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > totalSteps) currentStep = totalSteps;
+
+            // Show new step
+            document.getElementById(`step${currentStep}`).className = "step-active";
+
+            // Update UI elements
+            document.getElementById('progressBar').style.width = `${(currentStep / totalSteps) * 100}%`;
+            document.getElementById('stepIndicator').innerText = `Step ${currentStep} of ${totalSteps}: ${stepTitles[currentStep - 1]}`;
+
+            // Handle Button Visibility
+            document.getElementById('btnPrev').style.display = currentStep === 1 ? 'none' : 'block';
+
+            const btnNext = document.getElementById('btnNext');
+            if (currentStep === totalSteps) {
+                btnNext.innerText = "Proceed to Section 2 ➔";
+                btnNext.className = "px-8 py-2 rounded-lg font-bold text-white bg-green-600 shadow-md hover:bg-green-700 transition-all";
+
+                // The Continuous Link Logic:
+                btnNext.onclick = () => {
+                    // 1. Grab the final data
+                    let finalGender = document.getElementById('inputGender').value;
+                    let finalMultiplier = document.getElementById('outMultiplier').innerText;
+
+                    // 2. Save it to the browser's secret memory
+                    localStorage.setItem('plate_gender', finalGender);
+                    localStorage.setItem('plate_multiplier', finalMultiplier);
+
+                    // 3. Force the browser to open Section 2
+                    window.location.href = 'section2.html';
+                };
+            } else {
+                btnNext.innerText = "Next Step \u2192";
+                btnNext.className = "px-8 py-2 rounded-lg font-bold text-white bg-blue-600 shadow-md hover:bg-blue-700 transition-all";
+                btnNext.onclick = () => changeStep(1);
+            }
+
+            // Always update math when changing steps
+            updateSystem();
+        }
+
+        // --- 3. UI INITIALIZATION & INTERACTIONS ---
+        function setupUCLA() {
+            const container = document.getElementById('uclaButtons');
+            for (let i = 1; i <= 10; i++) {
+                let btn = document.createElement('button');
+                btn.innerText = i;
+                btn.id = `btnUCLA_${i}`;
+                btn.className = "h-12 md:h-16 rounded-xl text-lg font-bold border-2 border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700 transition-all shadow-sm";
+                btn.onclick = () => setUCLA(i);
+                container.appendChild(btn);
+            }
+        }
+
+        function setUCLA(val) {
+            document.getElementById('inputUCLA').value = val;
+
+            // Reset all buttons visually
+            for (let i = 1; i <= 10; i++) {
+                document.getElementById(`btnUCLA_${i}`).className = "h-12 md:h-16 rounded-xl text-lg font-bold border-2 border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:border-indigo-300 transition-all shadow-sm";
+            }
+            // Highlight selected button
+            let activeBtn = document.getElementById(`btnUCLA_${val}`);
+            activeBtn.className = "h-12 md:h-16 rounded-xl text-xl font-black border-2 border-indigo-600 bg-indigo-600 text-white shadow-lg transition-all transform scale-105";
+
+            // Update Description Card
+            document.getElementById('uclaLabel').innerText = uclaData[val].title;
+            document.getElementById('descUCLA').innerText = uclaData[val].desc;
+
+            updateSystem();
+        }
+
+        function setGender(gender) {
+            document.getElementById('inputGender').value = gender;
+            const btnMale = document.getElementById('btnMale');
+            const btnFemale = document.getElementById('btnFemale');
+
+            if (gender === 'Male') {
+                btnMale.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white shadow text-blue-700 transition-all";
+                btnFemale.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all bg-transparent";
+            } else {
+                btnFemale.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white shadow text-pink-600 transition-all";
+                btnMale.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all bg-transparent";
+            }
+            updateSystem();
+        }
+
+        // --- 4. CORE MATHEMATICAL ENGINE ---
+        function updateSystem() {
+            // Read Inputs
+            let age = parseInt(document.getElementById('inputAge').value);
+            let gender = document.getElementById('inputGender').value;
+            let mass = parseFloat(document.getElementById('inputMass').value);
+            let ucla = parseInt(document.getElementById('inputUCLA').value);
+
+            // Calculate Checkbox Risks (+0.15 each)
+            let extraRisk = 0;
+            let activeRisks = [];
+            const checkboxes = document.querySelectorAll('.risk-checkbox');
+            checkboxes.forEach((chk, index) => {
+                if (chk.checked) {
+                    extraRisk += 0.15;
+                    // Map index to names for dynamic text
+                    let names = ["Heavy Labor", "Wrist Athletics", "High-Velocity Transport", "Repetitive Impact"];
+                    activeRisks.push(names[index]);
+                }
+            });
+
+            // Update UI Labels
+            document.getElementById('valAge').innerText = age;
+            document.getElementById('valMass').innerText = mass;
+
+            // Bone Risk Logic
+            let badgeRisk = document.getElementById('badgeRisk');
+            if (gender === 'Female' && age >= 65) {
+                badgeRisk.className = "mt-4 px-3 py-2 rounded text-xs font-bold bg-red-100 text-red-700 text-center transition-all border border-red-200";
+                badgeRisk.innerText = "High Risk: Poor Bone Quality (Osteoporosis)";
+            } else if ((gender === 'Female' && age >= 50) || (gender === 'Male' && age >= 70)) {
+                badgeRisk.className = "mt-4 px-3 py-2 rounded text-xs font-bold bg-amber-100 text-amber-700 text-center transition-all border border-amber-200";
+                badgeRisk.innerText = "Moderate Risk: Potential Osteopenia";
+            } else {
+                badgeRisk.className = "mt-4 px-3 py-2 rounded text-xs font-bold bg-green-100 text-green-700 text-center transition-all border border-green-200";
+                badgeRisk.innerText = "Normal Bone Density Expected";
+            }
+
+            // Calculate Multiplier (Base 1.0 + 0.1 per UCLA over 3 + specific risks)
+            let multiplier = 1.0 + (Math.max(0, ucla - 3) * 0.1) + extraRisk;
+            document.getElementById('outMultiplier').innerText = multiplier.toFixed(2);
+
+            // Generate Dynamic Explanation Text
+            let summaryText = `Because the patient is a ${mass}kg ${gender} with a UCLA Activity Score of ${ucla}, `;
+            if (ucla <= 3) {
+                summaryText += `they primarily exert baseline physiological forces (1.0x). `;
+            } else {
+                summaryText += `they exert elevated muscular and dynamic forces. `;
+            }
+
+            if (activeRisks.length > 0) {
+                summaryText += `Due to additional risks (${activeRisks.join(', ')}), the multiplier is further increased. `;
+            }
+
+            summaryText += `Ultimately, the force applied to the 3D customized locking plate will be estimated at <strong>${multiplier.toFixed(2)} times higher</strong> than standard daily living loads. The calculator will use this to scale the 8.255mm FEA baseline to predict true micromotion.`;
+
+            document.getElementById('dynamicSummary').innerHTML = summaryText;
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            setupUCLA();
+            setUCLA(4); // Set default
+        };
+    </script>
+</body>
+
+</html>
