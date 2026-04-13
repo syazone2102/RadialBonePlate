@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Plate Calculator - Final Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .blueprint-bg {
+            background-color: #f8fafc;
+            background-image: linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @media print {
+            body {
+                background-color: white !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .shadow-2xl, .shadow-md, .shadow-sm {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .print-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex justify-center">
+
+    <div class="max-w-4xl w-full bg-white shadow-2xl rounded-xl overflow-hidden p-8 md:p-12 border border-slate-200">
+        
+        <!-- HEADER -->
+        <header class="flex justify-between items-end border-b-4 border-indigo-900 pb-6 mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">PRE-SURGICAL DESIGN REPORT</h1>
+                <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mt-2">Customized Radial Bone Locking Plate</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-slate-500 font-bold" id="reportDate">Generated: --/--/----</p>
+                <button onclick="window.print()" class="no-print mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 text-sm font-bold rounded-lg shadow transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    Print to PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- SECTION 1: Demographics -->
+        <section class="mb-10">
+            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">1</span>
+                Clinical Load Assessment
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-50 p-4 rounded border border-slate-200 text-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Biological Sex</p>
+                    <p class="text-xl font-bold text-slate-800" id="repGender">Male</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded border border-slate-200 text-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Patient Mass</p>
+                    <p class="text-xl font-bold text-slate-800"><span id="repMass">70</span> kg</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded border border-blue-200 text-center md:col-span-2">
+                    <p class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Dynamic Load Multiplier</p>
+                    <p class="text-2xl font-black text-blue-700"><span id="repMultiplier">1.0</span>x</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Dimensions -->
+        <section class="mb-10">
+            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">2</span>
+                Parametric Customization Data
+            </h2>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="w-full md:w-1/3 flex flex-col justify-center gap-4">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <span class="text-sm font-bold text-slate-600">Distal Width</span>
+                        <span class="font-black text-slate-800"><span id="repDistal">28.0</span> mm</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <span class="text-sm font-bold text-slate-600">Shaft Width</span>
+                        <span class="font-black text-slate-800"><span id="repShaft">11.5</span> mm</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2 bg-indigo-50 p-2 rounded">
+                        <span class="text-sm font-black text-indigo-800">Plate Thickness</span>
+                        <span class="font-black text-indigo-600"><span id="repThick">2.5</span> mm</span>
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3 bg-slate-50 border border-slate-200 p-4 rounded flex items-center justify-center">
+                    <p class="text-sm font-medium text-slate-500 italic text-center">3D Structural dimensions are digitally configured based on the parameters above. The 2.5mm baseline has been structurally modified to <span id="repThickQuote" class="font-bold">2.5</span>mm.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Micromotion -->
+        <section class="mb-10 print-break">
+            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">3</span>
+                FEA Micromotion Prediction Outcome
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div class="blueprint-bg p-6 border border-slate-200 rounded text-center">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Estimated Callus Displacement</p>
+                    <p class="text-5xl font-black text-slate-800 drop-shadow"><span id="repDisp">0.00</span><span class="text-xl">mm</span></p>
+                    <p class="text-xs text-slate-400 mt-2">FEA Baseline: 8.255mm | Reference Load: 500N</p>
+                </div>
+
+                <div id="repCard" class="p-6 rounded-xl border-2">
+                    <h3 class="font-bold text-lg mb-2 flex items-center gap-2" id="repStatusLabel">Calculating...</h3>
+                    <p class="text-sm opacity-90 leading-relaxed" id="repStatusDesc">Analyzing mechanical thresholds against the 2.0mm high-risk non-union limit.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Surgical Placement Guidelines -->
+        <section class="mb-6">
+            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">4</span>
+                Surgical Placement Boundaries
+            </h2>
+            <div class="bg-slate-50 border border-slate-200 rounded p-6">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="w-full md:w-1/3">
+                        <svg width="100%" viewBox="0 0 200 300" class="drop-shadow">
+                            <!-- Bone outline -->
+                            <path d="M 60 300 C 60 200, 40 100, 30 20 C 60 10, 140 10, 170 20 C 160 100, 140 200, 140 300 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2" />
+                            
+                            <!-- Volar Highlight -->
+                            <path d="M 60 250 C 50 150, 45 80, 45 50 C 80 45, 120 45, 155 50 C 155 80, 150 150, 140 250 Z" fill="rgba(16, 185, 129, 0.4)" stroke="#10b981" stroke-width="2" />
+                            
+                            <!-- Styloid Highlight -->
+                            <path d="M 30 20 C 20 40, 35 60, 45 50 C 45 30, 40 20, 30 20 Z" fill="rgba(59, 130, 246, 0.4)" stroke="#3b82f6" stroke-width="2" />
+                            
+                            <!-- Watershed Line -->
+                            <path d="M 35 35 Q 100 60 165 35" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="4,4" />
+                        </svg>
+                    </div>
+                    <div class="w-full md:w-2/3 space-y-4">
+                        <div class="border-l-4 border-emerald-500 pl-4">
+                            <h4 class="font-bold text-slate-800 text-sm">Target: Volar Zone (Green)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Plate must sit perfectly flush against the cortical palmar aspect to ensure maximum bicortical purchase.</p>
+                        </div>
+                        <div class="border-l-4 border-red-500 pl-4">
+                            <h4 class="font-bold text-slate-800 text-sm">Critical Danger: Watershed Line (Red)</h4>
+                            <p class="text-xs text-slate-600 mt-1">The plate MUST NOT extend past this highly distal dotted line. Doing so creates friction against the FPL tendon, leading to catastrophic rupture.</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <h4 class="font-bold text-slate-800 text-sm">Lateral Boundary: Radial Styloid (Blue)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Width cannot overhang this lateral edge. Critical for complex intra-articular locking screw entry.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-12 text-center text-xs text-slate-400 font-bold border-t border-slate-200 pt-6">
+            GENERATED BY RADIAL BONE PLATE CLINICAL DECISION SUPPORT SYSTEM <br>
+            <span class="font-normal no-print text-blue-500 mt-2 block cursor-pointer" onclick="window.location.href='index.html'">Start New Calculation</span>
+        </footer>
+
+    </div>
+
+    <script>
+        // Data Formatting & Injection
+        window.onload = () => {
+            // Timestamp
+            const d = new Date();
+            document.getElementById('reportDate').innerText = `Generated: ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+
+            // Load Data
+            let gender = localStorage.getItem('plate_gender') || 'Male';
+            let mass = parseFloat(localStorage.getItem('plate_mass')) || 70.0;
+            let multiplier = parseFloat(localStorage.getItem('plate_multiplier')) || 1.0;
+            let distal = parseFloat(localStorage.getItem('plate_distal')) || 28.0;
+            let shaft = parseFloat(localStorage.getItem('plate_shaft')) || 11.5;
+            let thick = parseFloat(localStorage.getItem('plate_thick')) || 2.5;
+
+            // Fill HTML
+            document.getElementById('repGender').innerText = gender;
+            document.getElementById('repMass').innerText = mass;
+            document.getElementById('repMultiplier').innerText = multiplier;
+            document.getElementById('repDistal').innerText = distal.toFixed(1);
+            document.getElementById('repShaft').innerText = shaft.toFixed(1);
+            document.getElementById('repThick').innerText = thick.toFixed(1);
+            document.getElementById('repThickQuote').innerText = thick.toFixed(1);
+
+            // Execute FEA Engine
+            const FEA_BASE_DISP = 8.255;
+            const FEA_REF_LOAD = 500;
+            const BASE_PLATE_THICKNESS = 2.5;
+
+            let force = mass * 9.81 * multiplier;
+            let forceFactor = force / FEA_REF_LOAD;
+            let thicknessFactor = Math.pow((BASE_PLATE_THICKNESS / thick), 3);
+            let disp = FEA_BASE_DISP * forceFactor * thicknessFactor;
+            
+            document.getElementById('repDisp').innerText = disp.toFixed(2);
+
+            // Apply Conditional Card Logic
+            const card = document.getElementById('repCard');
+            const label = document.getElementById('repStatusLabel');
+            const desc = document.getElementById('repStatusDesc');
+
+            if (disp <= 1.0) {
+                card.className = "p-6 rounded-xl border-2 bg-emerald-50 border-emerald-400 text-emerald-800";
+                label.innerHTML = `<span class="text-2xl">✓</span> CLEARED: Optimal Callus Formation`;
+                desc.innerText = "Construct mechanical clearance is fully viable. The fracture gap has controlled micromotion highly conducive to biological healing.";
+            } else if (disp <= 2.0) {
+                card.className = "p-6 rounded-xl border-2 bg-amber-50 border-amber-400 text-amber-800";
+                label.innerHTML = `<span class="text-2xl">⚠</span> BORDERLINE: Caution Advised`;
+                desc.innerText = "Displacement is elevated. It remains biologically viable, but post-surgical rehabilitation loading must be highly restricted.";
+            } else {
+                card.className = "p-6 rounded-xl border-2 bg-red-50 border-red-500 text-red-800";
+                label.innerHTML = `<span class="text-2xl">❌</span> WARNING: Non-Union Risk`;
+                desc.innerText = "Calculated maximum displacement breaches the 2.0mm threshold. Mechanical shear forces completely undermine secondary bone healing. Custom plate must be physically reinforced.";
+            }
+        };
+    </script>
+</body>
+
+</html>
