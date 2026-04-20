@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Plate Calculator - Section 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        /* Mathematical Prediction Dashboard Styles */
+        @keyframes pulse-danger {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .pulse-red {
+            animation: pulse-danger 2s infinite;
+            border-color: #f43f5e;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
+
+    <div class="max-w-6xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200"
+        id="printArea">
+
+        <header
+            class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 md:p-8 relative print:bg-white print:text-black print:border-b-2">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">Radial Plate Calculator</h1>
+                    <p class="text-sm mt-2 text-slate-300 font-medium uppercase tracking-widest print:text-slate-600">
+                        Section 4: Surgical Guide & Methodology</p>
+                </div>
+                <div class="text-right text-xs font-bold text-slate-400 bg-slate-900/50 p-2 rounded print:hidden">
+                    Module 4 of 4
+                </div>
+            </div>
+        </header>
+
+        <div class="p-6 md:p-10 relative">
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left Side: Data & Formulae -->
+                <div class="lg:col-span-6 space-y-6">
+                    <h2 class="text-xl font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Patient & Plate Variables
+                    </h2>
+                    
+                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 grid grid-cols-2 gap-4 shadow-inner">
+                        <div>
+                            <p class="text-[10px] font-bold text-indigo-700 uppercase">Patient Mass</p>
+                            <p class="text-2xl font-black text-indigo-900" id="dataMass">-- kg</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-indigo-700 uppercase">Activity Multiplier</p>
+                            <p class="text-2xl font-black text-indigo-900" id="dataMult">-- x</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-indigo-700 uppercase">Custom Plate Model</p>
+                            <p class="text-sm font-black text-indigo-900 truncate" id="dataModel">--</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-indigo-700 uppercase">Plate Thickness</p>
+                            <p class="text-2xl font-black text-indigo-900" id="dataThick">-- mm</p>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-xl font-bold text-slate-800 border-b pb-2 flex items-center gap-2 mt-8">
+                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                        Mathematical Prediction Engine
+                    </h2>
+                    
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="bg-white p-4 rounded border border-slate-200">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase">1. Derived Physiological Force</h3>
+                            <p class="text-sm font-[monospace] mt-2 bg-slate-50 p-2 border border-slate-200 rounded text-slate-700 font-bold">Force (N) = Mass × 9.81 × Activity Multiplier</p>
+                            <p class="font-black text-indigo-600 text-2xl mt-2" id="calcForce">-- N</p>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded border border-slate-200">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase">2. Area Moment of Inertia Scalar</h3>
+                            <p class="text-sm font-[monospace] mt-2 bg-slate-50 p-2 border border-slate-200 rounded text-slate-700 font-bold">ScaleFactor = (2.5 / Input Thickness)³</p>
+                            <p class="font-black text-indigo-600 text-2xl mt-2" id="calcStiff">--</p>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded border border-slate-200">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase">3. Structural Micromotion Yield</h3>
+                            <p class="text-sm font-[monospace] mt-2 bg-slate-50 p-2 border border-slate-200 rounded text-slate-700 font-bold">Yield = Base FEA × (Force / 500) × ScaleFactor</p>
+                            <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Using <span id="calcBaseFea">8.255</span>mm max displacement from <span id="calcFile">L1.txt</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: 3D Model & Output -->
+                <div class="lg:col-span-6 space-y-6">
+                    <h2 class="text-xl font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path>
+                        </svg>
+                        Selected Calculator Plate
+                    </h2>
+                    
+                    <div class="bg-blue-50/50 border border-slate-200 rounded-xl overflow-hidden h-80 relative flex items-center justify-center">
+                        <model-viewer id="finalPlateViewer" src="lockingplate1.gltf" auto-rotate camera-controls exposure="1.2" shadow-intensity="1" style="width: 100%; height: 100%;"></model-viewer>
+                    </div>
+                    
+                    <div id="finalOutputCard" class="bg-white border-2 border-slate-200 rounded-xl shadow-lg p-8 transform transition-all duration-500">
+                        <div class="text-center border-b border-slate-200 pb-6 mb-6">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Calculated Structural Prediction</p>
+                            <p class="text-7xl font-black drop-shadow-md text-slate-800" id="finalDisp">--<span class="text-2xl font-bold text-slate-400 ml-1">mm</span></p>
+                            <div id="finalStatus" class="mt-6 px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest bg-slate-200 text-slate-600 inline-block shadow-sm">
+                                Awaiting Data...
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 w-full">
+                            <div class="text-center">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Von Mises Stress</p>
+                                <p class="text-3xl font-black text-indigo-700 mt-1" id="finalStressStat"><span id="finalStress">0.0</span><span class="text-sm ml-1 font-bold">MPa</span></p>
+                            </div>
+                            <div class="text-center border-l border-slate-200">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Contact Pressure</p>
+                                <p class="text-3xl font-black text-blue-700 mt-1"><span id="finalPressure">0.0</span><span class="text-sm ml-1 font-bold">MPa</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg relative overflow-hidden print:hidden flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-lg mb-1 relative z-10 text-emerald-400">Calculator Methodology Complete</h3>
+                            <p class="text-xs text-slate-300 relative z-10">Data dynamically routed across all phases.</p>
+                        </div>
+                        <svg class="w-12 h-12 text-slate-700 opacity-50 absolute right-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-50 p-6 border-t border-slate-200 flex justify-between items-center print:hidden">
+            <button onclick="window.location.href='section3.html'"
+                class="px-6 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 shadow-sm hover:bg-slate-100 transition-all flex items-center gap-2">
+                &larr; Return to Section 3
+            </button>
+            <button onclick="window.location.href='final_report.html'"
+                class="px-8 py-3 rounded-xl font-bold text-white bg-indigo-600 shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all flex items-center gap-2">
+                Generate Final Report &rarr;
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function loadAndPredict() {
+            // Retrieve Data
+            let mass = parseFloat(localStorage.getItem('plate_mass')) || 70;
+            let mult = parseFloat(localStorage.getItem('plate_multiplier')) || 1.0;
+            let thick = parseFloat(localStorage.getItem('plate_thick')) || 2.5;
+            let model = localStorage.getItem('plate_model') || 'lockingplate1.gltf';
+            
+            // UI Set Base Data
+            document.getElementById('dataMass').innerText = mass + " kg";
+            document.getElementById('dataMult').innerText = mult.toFixed(2) + "x";
+            document.getElementById('dataModel').innerText = model;
+            document.getElementById('dataThick').innerText = thick.toFixed(1) + " mm";
+            
+            // Set 3D Model specifically to the plate
+            document.getElementById('finalPlateViewer').src = model;
+            
+            // Baseline deduction based on model selection
+            let baseDisp = 8.255;
+            let txtFile = "L1.txt";
+            if(model.includes('lockingplate2')) {
+                baseDisp = 9.102;
+                txtFile = "L2.txt";
+            }
+            else if(model.includes('lockingplate3')) {
+                baseDisp = 7.850;
+                txtFile = "L3.txt";
+            }
+
+            document.getElementById('calcBaseFea').innerText = baseDisp.toFixed(3);
+            document.getElementById('calcFile').innerText = txtFile;
+            
+            // Calculate Math Engine
+            let force = mass * 9.81 * mult;
+            document.getElementById('calcForce').innerText = force.toFixed(0) + " N";
+            
+            let scaleFactor = Math.pow(2.5 / thick, 3);
+            document.getElementById('calcStiff').innerText = scaleFactor.toFixed(3) + "x Multiplier";
+            
+            let finalDisp = baseDisp * (force / 500) * scaleFactor;
+            
+            // 4. Contact Pressure & Stress
+            let width = parseFloat(localStorage.getItem('plate_width')) || 28.0;
+            let areaFactor = 28.0 / width;
+            let finalPressure = 2.4 * (force / 500) * areaFactor;
+
+            let BASE_STRESS = 145.0; 
+            if (model.includes('lockingplate2')) { BASE_STRESS = 162.5; }
+            else if (model.includes('lockingplate3')) { BASE_STRESS = 185.0; } 
+            
+            let stressThickFactor = Math.pow(2.5 / thick, 2);
+            let finalStress = BASE_STRESS * (force / 500) * stressThickFactor;
+            
+            // Display Output
+            let dispEl = document.getElementById('finalDisp');
+            dispEl.innerHTML = finalDisp.toFixed(2) + '<span class="text-2xl font-bold ml-1 opacity-60">mm</span>';
+            
+            document.getElementById('finalPressure').innerText = finalPressure.toFixed(2);
+            document.getElementById('finalStress').innerText = finalStress.toFixed(1);
+            
+            let stressStat = document.getElementById('finalStressStat');
+            if (finalStress > 600) {
+                stressStat.className = "text-3xl font-black text-rose-600 mt-1 pulse-red rounded px-2 inline-block";
+            } else if (finalStress > 350) {
+                stressStat.className = "text-3xl font-black text-amber-500 mt-1";
+            } else {
+                stressStat.className = "text-3xl font-black text-indigo-700 mt-1";
+            }
+            
+            let finalStatus = document.getElementById('finalStatus');
+            let finalCard = document.getElementById('finalOutputCard');
+            
+            if(finalDisp <= 1.0) {
+                finalCard.className = "bg-emerald-50 border-2 border-emerald-400 rounded-xl shadow-lg p-8 transform transition-all duration-500 hover:scale-[1.02]";
+                dispEl.className = "text-7xl font-black drop-shadow-md text-emerald-700";
+                finalStatus.className = "mt-6 px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest bg-emerald-200 text-emerald-800 inline-block shadow-sm";
+                finalStatus.innerText = "Optimal Plate Stability";
+            } else if(finalDisp <= 2.0) {
+                finalCard.className = "bg-amber-50 border-2 border-amber-400 rounded-xl shadow-lg p-8 transform transition-all duration-500 hover:scale-[1.02]";
+                dispEl.className = "text-7xl font-black drop-shadow-md text-amber-700";
+                finalStatus.className = "mt-6 px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest bg-amber-200 text-amber-800 inline-block shadow-sm";
+                finalStatus.innerText = "Borderline - Monitor Loading";
+            } else {
+                finalCard.className = "bg-rose-50 border-2 border-rose-500 rounded-xl shadow-lg p-8 transform transition-all duration-500 hover:scale-[1.02] pulse-red";
+                dispEl.className = "text-7xl font-black drop-shadow-md text-rose-700";
+                finalStatus.className = "mt-6 px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest bg-rose-600 text-white inline-block shadow-lg";
+                finalStatus.innerText = "Warning: Clinical Failure Risk";
+            }
+        }
+
+        window.onload = loadAndPredict;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../radialbone"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "RADIALBONEPLATE"
+	}
+}
