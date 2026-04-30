@@ -1,0 +1,304 @@
+{
+	"asset": {
+		"generator": "SOLIDWORKSGLTF",
+		"version" : "2.0"
+	},
+"extensionsUsed": [ "KHR_lights_punctual", "Solidworks_custom_properties", "KHR_draco_mesh_compression"],
+"extensionsRequired": [ "KHR_draco_mesh_compression" ],
+	"scene" : 0,
+	"scenes": [
+		{
+			"name": "default - <Default>_Display State 1",
+			"nodes": [
+				0, 1]
+		}
+	],
+	"nodes": [
+		{
+			"matrix": [
+				0.45102,					-0.325218,					-0.831153,					0,
+				-0.28425,					0.830417,					-0.479176,					0,
+				0.84604,					0.452373,					0.282091,					0,
+				2.09808,					1.17886,					1.73373,					1
+			]
+			,"camera": 0
+			,"name": "current"		}
+,
+		{
+			"mesh": 0
+			,"name": "PART RIGHT RADIUS"		}
+	],
+	"cameras": [
+		{
+			"type": "orthographic",
+			"orthographic" : {
+				"xmag": 1,
+				"ymag" : 1,
+				"zfar" : 100,
+				"znear" : 0.01
+			}
+		}
+	],
+	"meshes" : [
+		{
+			"primitives" : [
+				{
+					"attributes" : {
+					"POSITION" : 1,
+					"NORMAL" : 2,
+					"TEXCOORD_0" : 3
+					},
+					"indices" : 0,
+					"mode": 4,
+					"material" : 0
+					,"extensions": {
+					"KHR_draco_mesh_compression": {
+					"bufferView": 0,
+					"attributes" : {
+					"POSITION": 0,
+					"NORMAL" : 1,
+					"TEXCOORD_0" : 2
+					}
+					}
+					}
+				},
+				{
+					"attributes" : {
+					"POSITION" : 5,
+					"NORMAL" : 6,
+					"TEXCOORD_0" : 7
+					},
+					"indices" : 4,
+					"mode": 4,
+					"material" : 0
+					,"extensions": {
+					"KHR_draco_mesh_compression": {
+					"bufferView": 1,
+					"attributes" : {
+					"POSITION": 0,
+					"NORMAL" : 1,
+					"TEXCOORD_0" : 2
+					}
+					}
+					}
+				},
+				{
+					"attributes" : {
+					"POSITION" : 9,
+					"NORMAL" : 10,
+					"TEXCOORD_0" : 11
+					},
+					"indices" : 8,
+					"mode": 4,
+					"material" : 0
+					,"extensions": {
+					"KHR_draco_mesh_compression": {
+					"bufferView": 2,
+					"attributes" : {
+					"POSITION": 0,
+					"NORMAL" : 1,
+					"TEXCOORD_0" : 2
+					}
+					}
+					}
+				},
+				{
+					"attributes" : {
+					"POSITION" : 13,
+					"NORMAL" : 14,
+					"TEXCOORD_0" : 15
+					},
+					"indices" : 12,
+					"mode": 4,
+					"material" : 0
+					,"extensions": {
+					"KHR_draco_mesh_compression": {
+					"bufferView": 3,
+					"attributes" : {
+					"POSITION": 0,
+					"NORMAL" : 1,
+					"TEXCOORD_0" : 2
+					}
+					}
+					}
+				},
+				{
+					"attributes" : {
+					"POSITION" : 17,
+					"NORMAL" : 18,
+					"TEXCOORD_0" : 19
+					},
+					"indices" : 16,
+					"mode": 4,
+					"material" : 0
+					,"extensions": {
+					"KHR_draco_mesh_compression": {
+					"bufferView": 4,
+					"attributes" : {
+					"POSITION": 0,
+					"NORMAL" : 1,
+					"TEXCOORD_0" : 2
+					}
+					}
+					}
+				}
+			]
+		}
+	],
+	"accessors" : [
+			{
+				"componentType" : 5123
+				,"count" : 64998
+				,"type" : "SCALAR"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14446
+				,"type" : "VEC3"
+				,"min" : [-2.79134721e-01, -1.26589239e-01, 8.06191802e-01]
+				,"max" : [1.17549435e-38, 1.17549435e-38, 8.92099261e-01]
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14446
+				,"type" : "VEC3"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14446
+				,"type" : "VEC2"
+			},
+			{
+				"componentType" : 5123
+				,"count" : 64998
+				,"type" : "SCALAR"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14641
+				,"type" : "VEC3"
+				,"min" : [-2.60993838e-01, -9.83580425e-02, 8.75471890e-01]
+				,"max" : [1.17549435e-38, 1.17549435e-38, 1.03475535e+00]
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14641
+				,"type" : "VEC3"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14641
+				,"type" : "VEC2"
+			},
+			{
+				"componentType" : 5123
+				,"count" : 64998
+				,"type" : "SCALAR"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14752
+				,"type" : "VEC3"
+				,"min" : [-2.45577246e-01, -8.96638036e-02, 9.51605082e-01]
+				,"max" : [1.17549435e-38, 1.17549435e-38, 1.03281629e+00]
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14752
+				,"type" : "VEC3"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14752
+				,"type" : "VEC2"
+			},
+			{
+				"componentType" : 5123
+				,"count" : 64998
+				,"type" : "SCALAR"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14693
+				,"type" : "VEC3"
+				,"min" : [-2.76690125e-01, -1.20757096e-01, 8.09037983e-01]
+				,"max" : [1.17549435e-38, 1.17549435e-38, 9.72155273e-01]
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14693
+				,"type" : "VEC3"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 14693
+				,"type" : "VEC2"
+			},
+			{
+				"componentType" : 5123
+				,"count" : 53550
+				,"type" : "SCALAR"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 11850
+				,"type" : "VEC3"
+				,"min" : [-2.76995152e-01, -1.24360919e-01, 8.09041679e-01]
+				,"max" : [1.17549435e-38, 1.17549435e-38, 1.02490830e+00]
+			},
+			{
+				"componentType" : 5126
+				,"count" : 11850
+				,"type" : "VEC3"
+			},
+			{
+				"componentType" : 5126
+				,"count" : 11850
+				,"type" : "VEC2"
+			}
+	],
+	"materials": [
+			{
+				"pbrMetallicRoughness": {
+					"baseColorFactor": [
+						0.498039, 0.498039, 0.498039, 1
+					]
+					,"metallicFactor": 0
+					,"roughnessFactor": 1
+				}
+			}
+	],
+	"bufferViews" : [
+			{
+				"buffer": 0
+				,"byteOffset" : 0
+				,"byteLength" : 77804
+			},
+			{
+				"buffer": 0
+				,"byteOffset" : 77804
+				,"byteLength" : 76160
+			},
+			{
+				"buffer": 0
+				,"byteOffset" : 153964
+				,"byteLength" : 80720
+			},
+			{
+				"buffer": 0
+				,"byteOffset" : 234684
+				,"byteLength" : 75692
+			},
+			{
+				"buffer": 0
+				,"byteOffset" : 310376
+				,"byteLength" : 60856
+			}
+	],
+	"buffers" : [
+			{
+				"byteLength": 371232
+				,"uri" : "part_right_radius_data.bin"
+			}
+	]
+}

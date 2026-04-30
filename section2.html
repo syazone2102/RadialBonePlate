@@ -1,409 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radial Plate Calculator - Section 2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-    <style>
-        .transition-all {
-            transition-property: all;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 300ms;
-        }
-
-        .gauge-bg {
-            background-color: #e2e8f0;
-            border-radius: 9999px;
-            overflow: hidden;
-            height: 6px;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .gauge-fill {
-            height: 100%;
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
-
-        .blueprint-bg {
-            background-color: #f8fafc;
-            background-image: linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>RadialPlate CDSS — Size</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0f172a; min-height: 100vh; padding-bottom: 80px; }
+  ::-webkit-scrollbar { display: none; }
+  .stepper { display: flex; align-items: center; gap: 0; padding: 0 16px; }
+  .step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; z-index: 1; }
+  .step-active .step-dot { background: #6366f1; color: white; box-shadow: 0 0 0 4px rgba(99,102,241,0.25); }
+  .step-done .step-dot { background: #10b981; color: white; }
+  .step-inactive .step-dot { background: #1e293b; color: #64748b; border: 2px solid #334155; }
+  .step-label { font-size: 9px; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .step-active .step-label { color: #818cf8; }
+  .step-done .step-label { color: #34d399; }
+  .step-inactive .step-label { color: #475569; }
+  .step-line { flex: 1; height: 2px; background: #1e293b; margin-top: -16px; }
+  .step-line-done { background: #10b981; }
+  .card { background: #1e293b; border-radius: 16px; border: 1px solid #334155; padding: 20px; margin-bottom: 16px; }
+  .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 6px; }
+  .input-styled { width: 100%; padding: 12px 14px; background: #0f172a; border: 1.5px solid #334155; border-radius: 10px; color: #f1f5f9; font-size: 16px; font-weight: 700; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .input-styled:focus { border-color: #6366f1; }
+  select.input-styled { cursor: pointer; }
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #334155; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #6366f1; box-shadow: 0 2px 8px rgba(99,102,241,0.5); }
+  .gauge-track { height: 6px; background: #334155; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .gauge-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+  .plate-card { background: #0f172a; border-radius: 14px; border: 2px solid #334155; padding: 16px; cursor: pointer; transition: all 0.2s; flex: 1; min-width: 0; }
+  .plate-card.active { border-color: #6366f1; background: rgba(99,102,241,0.1); box-shadow: 0 0 0 4px rgba(99,102,241,0.15); }
+  .plate-badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #6366f1; color: white; display: inline-block; margin-bottom: 8px; }
+  .blueprint { background: #0f172a; background-image: linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px); background-size: 24px 24px; }
+  .snap-btn { font-size: 10px; font-weight: 700; padding: 4px 10px; background: #334155; color: #94a3b8; border-radius: 6px; border: none; cursor: pointer; }
+  .snap-btn:active { background: #6366f1; color: white; }
+  .btn-primary { width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 800; color: white; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(99,102,241,0.4); display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .btn-back { width: 100%; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 700; color: #94a3b8; background: #1e293b; border: 1.5px solid #334155; cursor: pointer; margin-bottom: 10px; }
+  .sec-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #6366f1; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: #1e293b; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15,23,42,0.97); backdrop-filter: blur(16px); border-top: 1px solid #1e293b; display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 4px; cursor: pointer; text-decoration: none; }
+  .nav-icon { font-size: 20px; margin-bottom: 2px; }
+  .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .nav-item.active .nav-label { color: #818cf8; }
+  .nav-item:not(.active) .nav-label { color: #475569; }
+</style>
 </head>
+<body>
 
-<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
-
-    <div class="max-w-6xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
-
-        <header class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 md:p-8 relative">
-            <h1 class="text-3xl font-extrabold tracking-tight">Radial Plate Calculator</h1>
-            <p class="text-sm mt-2 text-slate-300 font-medium uppercase tracking-widest">Section 2: Interactive Sizing &
-                Validation</p>
-        </header>
-
-        <div class="p-6 md:p-10 relative">
-
-            <div
-                class="mb-8 p-5 bg-indigo-50 rounded-xl border border-indigo-200 flex flex-col md:flex-row items-center justify-between shadow-inner transition-all">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-indigo-100 rounded-full text-indigo-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                            </path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1">State Manager</p>
-                        <p class="text-sm font-bold text-indigo-900" id="statusInheritance">Checking for Patient Data...
-                        </p>
-                    </div>
-                </div>
-                <div
-                    class="mt-4 md:mt-0 bg-white p-2 px-4 rounded-lg border border-indigo-100 flex items-center shadow-sm">
-                    <span class="text-sm font-bold text-slate-500 mr-3">Active Profile:</span>
-                    <select id="inputGender"
-                        class="p-1 rounded bg-slate-50 border border-slate-300 text-indigo-700 font-black outline-none cursor-pointer"
-                        onchange="updateSystem()">
-                        <option value="Male">Male (Asian Avg)</option>
-                        <option value="Female">Female (Asian Avg)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
-                <div class="lg:col-span-12">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-sm">1</span>
-                        <h2 class="text-xl font-bold text-slate-800">Choose Base Implant Model</h2>
-                    </div>
-                    <p class="text-sm text-slate-600 mb-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">Select the base radial locking plate design that best matches the patient's fracture configuration. Each generation offers different screw-hole trajectories, rigidities, and anatomical contouring profiles.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Option 1 -->
-                        <button onclick="selectPlate('lockingplate1.gltf', 1)" id="btnPlate1" class="plate-option bg-indigo-50 p-5 rounded-xl border-2 border-indigo-600 shadow-md text-left transition-all relative overflow-hidden group">
-                            <div id="badgePlate1" class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] px-3 py-1 rounded-bl-lg font-bold">ACTIVE</div>
-                            <h3 class="font-bold text-indigo-900 mb-2">Standard Volar Plate</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">Standard 3-hole distal span. Optimised for simple distal radius extra-articular fractures with classic anatomical contouring.</p>
-                        </button>
-
-                        <!-- Option 2 -->
-                        <button onclick="selectPlate('lockingplate2.glb', 2)" id="btnPlate2" class="plate-option bg-white p-5 rounded-xl border-2 border-slate-200 hover:border-indigo-300 shadow-sm text-left transition-all relative overflow-hidden group">
-                            <div id="badgePlate2" class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] px-3 py-1 rounded-bl-lg font-bold hidden">ACTIVE</div>
-                            <h3 class="font-bold text-slate-800 group-hover:text-indigo-700 mb-2 transition-colors">Juxta-Articular Plate</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">Wider distal footprint for complex intra-articular fractures. Enhanced subchondral support with variable angle vectors.</p>
-                        </button>
-
-                        <!-- Option 3 -->
-                        <button onclick="selectPlate('lockingplate3.glb', 3)" id="btnPlate3" class="plate-option bg-white p-5 rounded-xl border-2 border-slate-200 hover:border-indigo-300 shadow-sm text-left transition-all relative overflow-hidden group">
-                            <div id="badgePlate3" class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] px-3 py-1 rounded-bl-lg font-bold hidden">ACTIVE</div>
-                            <h3 class="font-bold text-slate-800 group-hover:text-indigo-700 mb-2 transition-colors">Narrow Shaft Plate</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">Extended diaphyseal length with a narrow profile. Designed for patients with smaller anatomy or long oblique fractures.</p>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-12 border-t border-slate-200 pt-6 mt-2">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-sm">2</span>
-                        <h2 class="text-xl font-bold text-slate-800">Parametric Sizing & Validation</h2>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="flex justify-between items-end border-b pb-2 mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Dimensional Scaling</h3>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Interactive Limits Enabled</p>
-                    </div>
-
-                    <div
-                        class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
-                        <div class="flex justify-between items-center mb-4">
-                            <label
-                                class="block text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">Distal
-                                Volar Width</label>
-                            <div class="flex items-center gap-3">
-                                <button onclick="snapToAverage('width')"
-                                    class="text-[10px] uppercase font-bold bg-slate-100 hover:bg-slate-200 text-slate-500 px-2 py-1 rounded transition-colors border border-slate-200">Snap
-                                    to Avg</button>
-                                <span class="text-2xl font-black text-blue-600 w-20 text-right"><span
-                                        id="valWidth">30</span><span
-                                        class="text-sm font-normal text-slate-400 ml-1">mm</span></span>
-                            </div>
-                        </div>
-                        <input type="range" id="inputWidth" min="20" max="45" value="30"
-                            class="w-full accent-blue-600 cursor-pointer" oninput="updateSystem()">
-                        <div class="gauge-bg">
-                            <div id="gaugeWidth" class="gauge-fill bg-green-500 w-0"></div>
-                        </div>
-                        <div class="flex justify-between mt-1"><span
-                                class="text-[10px] text-slate-400">Deviation</span><span id="warnWidth"
-                                class="text-[10px] font-bold text-green-600">0%</span></div>
-                    </div>
-
-                    <div
-                        class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
-                        <div class="flex justify-between items-center mb-4">
-                            <label
-                                class="block text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">Distal
-                                Depth (AP)</label>
-                            <div class="flex items-center gap-3">
-                                <button onclick="snapToAverage('depth')"
-                                    class="text-[10px] uppercase font-bold bg-slate-100 hover:bg-slate-200 text-slate-500 px-2 py-1 rounded transition-colors border border-slate-200">Snap
-                                    to Avg</button>
-                                <span class="text-2xl font-black text-blue-600 w-20 text-right"><span
-                                        id="valDepth">20</span><span
-                                        class="text-sm font-normal text-slate-400 ml-1">mm</span></span>
-                            </div>
-                        </div>
-                        <input type="range" id="inputDepth" min="10" max="35" value="20"
-                            class="w-full accent-blue-600 cursor-pointer" oninput="updateSystem()">
-                        <div class="gauge-bg">
-                            <div id="gaugeDepth" class="gauge-fill bg-green-500 w-0"></div>
-                        </div>
-                        <div class="flex justify-between mt-1"><span
-                                class="text-[10px] text-slate-400">Deviation</span><span id="warnDepth"
-                                class="text-[10px] font-bold text-green-600">0%</span></div>
-                    </div>
-
-                    <div
-                        class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 shadow-sm hover:shadow-md transition-all group mt-8">
-                        <div class="flex justify-between items-center mb-4">
-                            <div>
-                                <label
-                                    class="block text-sm font-bold text-indigo-900 group-hover:text-indigo-600 transition-colors">Plate
-                                    Thickness</label>
-                                <p class="text-[10px] text-indigo-500 mt-1 uppercase tracking-wider font-bold">Directly
-                                    modifies FEA stability</p>
-                            </div>
-                            <span class="text-3xl font-black text-indigo-600 w-24 text-right"><span
-                                    id="valThick">2.5</span><span
-                                    class="text-sm font-normal text-indigo-400 ml-1">mm</span></span>
-                        </div>
-                        <input type="range" id="inputThick" min="1.5" max="5.0" step="0.1" value="2.5"
-                            class="w-full accent-indigo-600 cursor-pointer" oninput="updateSystem()">
-                    </div>
-                </div>
-
-                <div class="lg:col-span-5 space-y-6">
-                    <h3 class="text-lg font-bold text-slate-800 border-b pb-2">3D Component View</h3>
-
-                    <div
-                        class="bg-white border border-slate-200 rounded-xl shadow-inner h-96 blueprint-bg flex items-center justify-center relative overflow-hidden">
-
-                        <div
-                            class="absolute top-3 left-3 bg-white/90 p-2 rounded shadow-sm border border-slate-200 z-10">
-                            <p class="text-[10px] font-bold text-indigo-600 uppercase mb-1 flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
-                                    </path>
-                                </svg>
-                                AR Ready
-                            </p>
-                            <p class="text-xs font-black text-slate-800" id="hudTarget">Target W: 31.6 | D: 20.2</p>
-                        </div>
-
-                        <model-viewer src="lockingplate1.gltf" ar ar-modes="webxr scene-viewer quick-look"
-                            camera-controls tone-mapping="neutral" shadow-intensity="1" shadow-softness="0.5"
-                            exposure="1.2" auto-rotate rotation-per-second="30deg" style="width: 100%; height: 100%;"
-                            alt="3D CAD model of a radial locking plate">
-
-                            <button slot="ar-button"
-                                class="absolute bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg font-bold text-sm flex items-center gap-2 hover:bg-indigo-700 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                                View in Space (AR)
-                            </button>
-                        </model-viewer>
-                    </div>
-
-                    <div
-                        class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-sm text-amber-900 shadow-sm flex gap-3">
-                        <svg class="w-6 h-6 flex-shrink-0 text-amber-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                        <p><strong>Warning:</strong> Ensure the generated plate footprint does not exceed the distal
-                            width bounding box to avoid overlapping the radioulnar joint.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-slate-50 p-6 border-t border-slate-200 flex justify-between items-center">
-            <button onclick="goBack()"
-                class="px-6 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 shadow-sm hover:bg-slate-100 transition-all flex items-center gap-2">
-                &larr; Return to index
-            </button>
-            <button onclick="saveAndProceed()"
-                class="px-8 py-3 rounded-xl font-bold text-white bg-blue-600 shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all flex items-center transform hover:-translate-y-1">
-                Save & Proceed to FEA Prediction &rarr;
-            </button>
-        </div>
+<header style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%); padding: 24px 20px 20px;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+    <div style="width:40px;height:40px;background:rgba(99,102,241,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">📏</div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:0.1em;">Radial Plate CDSS</div>
+      <div style="font-size:18px;font-weight:900;color:white;">Phase 2: Sizing</div>
     </div>
+  </div>
+  <div class="stepper">
+    <div class="step step-done"><div class="step-dot">✓</div><div class="step-label">Assess</div></div>
+    <div class="step-line step-line-done"></div>
+    <div class="step step-active"><div class="step-dot">2</div><div class="step-label">Size</div></div>
+    <div class="step-line"></div>
+    <div class="step step-inactive"><div class="step-dot">3</div><div class="step-label">FEA</div></div>
+    <div class="step-line"></div>
+    <div class="step step-inactive"><div class="step-dot">4</div><div class="step-label">Guide</div></div>
+    <div class="step-line"></div>
+    <div class="step step-inactive"><div class="step-dot">✓</div><div class="step-label">Report</div></div>
+  </div>
+</header>
 
-    <script>
-        const demoAverages = {
-            "Male": { width: 31.6, depth: 20.2 },
-            "Female": { width: 27.1, depth: 16.9 }
-        };
+<!-- Status Banner -->
+<div style="margin:16px;padding:14px;background:#1e293b;border-radius:12px;border:1px solid #334155;display:flex;align-items:center;justify-content:space-between;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;flex-shrink:0;"></div>
+    <div>
+      <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Data Pipeline</div>
+      <div style="font-size:13px;font-weight:700;color:#f1f5f9;" id="statusInheritance">Checking patient data...</div>
+    </div>
+  </div>
+  <select id="inputGender" class="input-styled" style="width:auto;font-size:13px;padding:8px 10px;" onchange="updateSystem()">
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+</div>
 
-        function goBack() {
-            localStorage.setItem('plate_width', document.getElementById('inputWidth').value);
-            localStorage.setItem('plate_depth', document.getElementById('inputDepth').value);
-            localStorage.setItem('plate_thick', document.getElementById('inputThick').value);
-            window.location.href = 'index.html';
-        }
+<div style="padding:0 16px;">
 
-        function checkInheritance() {
-            let savedGender = localStorage.getItem('plate_gender');
-            const statusEl = document.getElementById('statusInheritance');
-            const genderSelect = document.getElementById('inputGender');
+  <!-- Step 1: Choose Plate -->
+  <div class="sec-title">① Choose Implant Model</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
 
-            if (savedGender) {
-                statusEl.innerText = "Data linked from index.";
-                statusEl.className = "text-sm font-bold text-emerald-600";
-                genderSelect.value = savedGender;
-                genderSelect.disabled = true;
-                genderSelect.className = "p-1 rounded bg-slate-200 border border-slate-300 text-slate-500 font-bold outline-none cursor-not-allowed";
-            } else {
-                statusEl.innerText = "Manual Testing Mode.";
-                statusEl.className = "text-sm font-bold text-amber-600";
-            }
-        }
+    <button onclick="selectPlate('lockingplate1.gltf',1)" id="btnPlate1" class="plate-card active" style="text-align:left;">
+      <div class="plate-badge" id="badgePlate1">ACTIVE</div>
+      <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">Standard Volar Plate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;">3-hole distal span. Optimised for simple extra-articular fractures with classic contouring.</div>
+    </button>
 
-        function snapToAverage(dimension) {
-            let gender = document.getElementById('inputGender').value;
-            let avg = demoAverages[gender][dimension];
-            if (dimension === 'width') document.getElementById('inputWidth').value = avg;
-            if (dimension === 'depth') document.getElementById('inputDepth').value = avg;
-            updateSystem();
-        }
+    <button onclick="selectPlate('lockingplate2.glb',2)" id="btnPlate2" class="plate-card" style="text-align:left;">
+      <div class="plate-badge" id="badgePlate2" style="display:none;">ACTIVE</div>
+      <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">Juxta-Articular Plate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;">Wider footprint for complex intra-articular fractures. Enhanced subchondral support.</div>
+    </button>
 
-        function updateGauge(current, baseline, gaugeId, warnId) {
-            const gauge = document.getElementById(gaugeId);
-            const warnText = document.getElementById(warnId);
+    <button onclick="selectPlate('lockingplate3.glb',3)" id="btnPlate3" class="plate-card" style="text-align:left;">
+      <div class="plate-badge" id="badgePlate3" style="display:none;">ACTIVE</div>
+      <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">Narrow Shaft Plate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;">Extended diaphyseal length, narrow profile. For smaller anatomy or long oblique fractures.</div>
+    </button>
 
-            const rawDev = (Math.abs(current - baseline) / baseline) * 100;
-            const fillWidth = Math.min(rawDev * 3, 100);
+  </div>
 
-            gauge.style.width = `${fillWidth}%`;
+  <!-- 3D Viewer -->
+  <div class="blueprint" style="border-radius:16px;border:1px solid #334155;height:260px;margin-bottom:16px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:10px;left:10px;background:rgba(15,23,42,0.85);padding:6px 10px;border-radius:8px;z-index:10;border:1px solid #334155;">
+      <div style="font-size:9px;font-weight:800;color:#818cf8;text-transform:uppercase;">AR Ready · 3D View</div>
+      <div style="font-size:11px;font-weight:700;color:#f1f5f9;" id="hudTarget">Target W: 31.6 | D: 20.2</div>
+    </div>
+    <model-viewer id="plateViewer" src="lockingplate1.gltf" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" shadow-intensity="1" exposure="1.2" auto-rotate rotation-per-second="30deg" style="width:100%;height:100%;" alt="3D locking plate model">
+      <button slot="ar-button" style="position:absolute;bottom:10px;right:10px;background:#6366f1;color:white;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">View AR</button>
+    </model-viewer>
+  </div>
 
-            if (rawDev <= 5) {
-                gauge.style.backgroundColor = '#22c55e';
-                warnText.innerText = `Dev: ${rawDev.toFixed(1)}% (Optimal)`;
-                warnText.className = "text-[10px] font-bold text-green-600";
-            } else if (rawDev <= 15) {
-                gauge.style.backgroundColor = '#f59e0b';
-                warnText.innerText = `Dev: ${rawDev.toFixed(1)}% (Acceptable)`;
-                warnText.className = "text-[10px] font-bold text-amber-600";
-            } else {
-                gauge.style.backgroundColor = '#ef4444';
-                warnText.innerText = `Dev: ${rawDev.toFixed(1)}% (Warning)`;
-                warnText.className = "text-[10px] font-bold text-red-600";
-            }
-        }
+  <!-- Step 2: Parametric Sizing -->
+  <div class="sec-title">② Parametric Sizing</div>
+  <div class="card">
+    <!-- Width -->
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div class="label">Distal Volar Width</div>
+          <button class="snap-btn" onclick="snapToAverage('width')">Snap to Avg</button>
+        </div>
+        <div style="font-size:26px;font-weight:900;color:#6366f1;"><span id="valWidth">30</span><span style="font-size:12px;color:#64748b;"> mm</span></div>
+      </div>
+      <input type="range" id="inputWidth" min="20" max="45" value="30" oninput="updateSystem()">
+      <div class="gauge-track"><div id="gaugeWidth" class="gauge-fill" style="width:0%;background:#10b981;"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:10px;color:#64748b;">Deviation</span>
+        <span style="font-size:10px;font-weight:700;color:#10b981;" id="warnWidth">0%</span>
+      </div>
+    </div>
+    <!-- Depth -->
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div class="label">Distal Depth (AP)</div>
+          <button class="snap-btn" onclick="snapToAverage('depth')">Snap to Avg</button>
+        </div>
+        <div style="font-size:26px;font-weight:900;color:#6366f1;"><span id="valDepth">20</span><span style="font-size:12px;color:#64748b;"> mm</span></div>
+      </div>
+      <input type="range" id="inputDepth" min="10" max="35" value="20" oninput="updateSystem()">
+      <div class="gauge-track"><div id="gaugeDepth" class="gauge-fill" style="width:0%;background:#10b981;"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:10px;color:#64748b;">Deviation</span>
+        <span style="font-size:10px;font-weight:700;color:#10b981;" id="warnDepth">0%</span>
+      </div>
+    </div>
+    <!-- Thickness -->
+    <div style="background:rgba(99,102,241,0.08);border-radius:12px;padding:14px;border:1px solid rgba(99,102,241,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div class="label" style="color:#818cf8;">Plate Thickness</div>
+          <div style="font-size:9px;color:#6366f1;font-weight:600;text-transform:uppercase;">Directly modifies FEA stability</div>
+        </div>
+        <div style="font-size:30px;font-weight:900;color:#818cf8;"><span id="valThick">2.5</span><span style="font-size:12px;color:#6366f1;"> mm</span></div>
+      </div>
+      <input type="range" id="inputThick" min="1.5" max="5.0" step="0.1" value="2.5" style="accent-color:#6366f1;" oninput="updateSystem()">
+    </div>
+  </div>
 
-        function updateSystem() {
-            let gender = document.getElementById('inputGender').value;
-            let width = parseFloat(document.getElementById('inputWidth').value);
-            let depth = parseFloat(document.getElementById('inputDepth').value);
-            let thick = parseFloat(document.getElementById('inputThick').value);
+  <!-- Warning -->
+  <div style="background:#2d1b00;border:1px solid #92400e;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;">
+    <span style="font-size:20px;">⚠️</span>
+    <p style="font-size:12px;color:#fcd34d;font-weight:600;line-height:1.5;margin:0;"><strong>Warning:</strong> Ensure the plate footprint does not exceed the distal width bounding box to avoid overlapping the radioulnar joint.</p>
+  </div>
 
-            document.getElementById('valWidth').innerText = width;
-            document.getElementById('valDepth').innerText = depth;
-            document.getElementById('valThick').innerText = thick.toFixed(1);
+  <!-- Actions -->
+  <button class="btn-back" onclick="goBack()">← Return to Assessment</button>
+  <button class="btn-primary" onclick="saveAndProceed()">Save & Proceed to FEA Prediction →</button>
 
-            const baseline = demoAverages[gender];
+</div>
 
-            // 3. UPDATED: Removed the old SVG call, just updating the HUD text now
-            document.getElementById('hudTarget').innerText = `Target W: ${baseline.width} | D: ${baseline.depth}`;
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span><span class="nav-label">Assess</span></a>
+  <a class="nav-item active" href="section2.html"><span class="nav-icon">📏</span><span class="nav-label">Size</span></a>
+  <a class="nav-item" href="section3.html"><span class="nav-icon">⚡</span><span class="nav-label">FEA</span></a>
+  <a class="nav-item" href="section4.html"><span class="nav-icon">🔬</span><span class="nav-label">Guide</span></a>
+  <a class="nav-item" href="final_report.html"><span class="nav-icon">📋</span><span class="nav-label">Report</span></a>
+</nav>
 
-            updateGauge(width, baseline.width, 'gaugeWidth', 'warnWidth');
-            updateGauge(depth, baseline.depth, 'gaugeDepth', 'warnDepth');
+<script>
+const demoAverages = { "Male":{width:31.6,depth:20.2}, "Female":{width:27.1,depth:16.9} };
 
-            // Reflect parametric sizes onto the 3D CAD model
-            const modelViewer = document.querySelector('model-viewer');
-            if (modelViewer) {
-                // Calculate scale multipliers relative to baseline
-                let scaleX = width / baseline.width;
-                let scaleZ = depth / baseline.depth;
-                let scaleY = thick / 2.5; // Assuming 2.5mm is the baseline CAD thickness
+function goBack() {
+  localStorage.setItem('plate_width', document.getElementById('inputWidth').value);
+  localStorage.setItem('plate_depth', document.getElementById('inputDepth').value);
+  localStorage.setItem('plate_thick', document.getElementById('inputThick').value);
+  window.location.href = 'index.html';
+}
 
-                // Assuming X is width, Z is depth (AP), and Y is thickness in the 3D space. Adjust if axes differ.
-                modelViewer.setAttribute('scale', `${scaleX} ${scaleY} ${scaleZ}`);
-            }
-        }
+function checkInheritance() {
+  let savedGender = localStorage.getItem('plate_gender');
+  const statusEl = document.getElementById('statusInheritance');
+  const genderSelect = document.getElementById('inputGender');
+  if (savedGender) {
+    statusEl.innerText = "Data linked from Phase 1.";
+    statusEl.style.color = "#34d399";
+    genderSelect.value = savedGender;
+    genderSelect.disabled = true;
+    genderSelect.style.opacity = "0.5";
+  } else {
+    statusEl.innerText = "Manual Testing Mode.";
+    statusEl.style.color = "#fbbf24";
+  }
+}
 
-        function selectPlate(filename, index) {
-            const viewer = document.querySelector('model-viewer');
-            if (viewer) {
-                viewer.src = filename;
-            }
+function snapToAverage(dim) {
+  const g = document.getElementById('inputGender').value;
+  const avg = demoAverages[g][dim];
+  if (dim === 'width') document.getElementById('inputWidth').value = avg;
+  if (dim === 'depth') document.getElementById('inputDepth').value = avg;
+  updateSystem();
+}
 
-            // Update UI buttons
-            [1, 2, 3].forEach(i => {
-                const btn = document.getElementById(`btnPlate${i}`);
-                const badge = document.getElementById(`badgePlate${i}`);
-                if (i === index) {
-                    btn.classList.add('border-indigo-600', 'bg-indigo-50', 'shadow-md');
-                    btn.classList.remove('border-slate-200', 'bg-white', 'hover:border-indigo-300', 'shadow-sm');
-                    const title = btn.querySelector('h3');
-                    title.classList.remove('text-slate-800', 'group-hover:text-indigo-700');
-                    title.classList.add('text-indigo-900');
-                    if(badge) badge.classList.remove('hidden');
-                } else {
-                    btn.classList.remove('border-indigo-600', 'bg-indigo-50', 'shadow-md');
-                    btn.classList.add('border-slate-200', 'bg-white', 'hover:border-indigo-300', 'shadow-sm');
-                    const title = btn.querySelector('h3');
-                    title.classList.add('text-slate-800', 'group-hover:text-indigo-700');
-                    title.classList.remove('text-indigo-900');
-                    if(badge) badge.classList.add('hidden');
-                }
-            });
-            
-            // Save selection directly to local storage to persist state
-            localStorage.setItem('plate_model', filename);
-        }
+function updateGauge(current, baseline, gaugeId, warnId) {
+  const gauge = document.getElementById(gaugeId);
+  const warn = document.getElementById(warnId);
+  const dev = (Math.abs(current - baseline) / baseline) * 100;
+  gauge.style.width = Math.min(dev * 3, 100) + '%';
+  if (dev <= 5) { gauge.style.background = '#10b981'; warn.innerText = `Dev: ${dev.toFixed(1)}% (Optimal)`; warn.style.color = '#34d399'; }
+  else if (dev <= 15) { gauge.style.background = '#f59e0b'; warn.innerText = `Dev: ${dev.toFixed(1)}% (Acceptable)`; warn.style.color = '#fbbf24'; }
+  else { gauge.style.background = '#ef4444'; warn.innerText = `Dev: ${dev.toFixed(1)}% (Warning)`; warn.style.color = '#f87171'; }
+}
 
-        function saveAndProceed() {
-            localStorage.setItem('plate_width', document.getElementById('inputWidth').value);
-            localStorage.setItem('plate_depth', document.getElementById('inputDepth').value);
-            localStorage.setItem('plate_thick', document.getElementById('inputThick').value);
-            
-            // Ensure exactly one model is designated if user hasn't actively clicked
-            if(!localStorage.getItem('plate_model')) {
-                localStorage.setItem('plate_model', 'lockingplate1.gltf');
-            }
+function updateSystem() {
+  const g = document.getElementById('inputGender').value;
+  const w = parseFloat(document.getElementById('inputWidth').value);
+  const d = parseFloat(document.getElementById('inputDepth').value);
+  const t = parseFloat(document.getElementById('inputThick').value);
+  document.getElementById('valWidth').innerText = w;
+  document.getElementById('valDepth').innerText = d;
+  document.getElementById('valThick').innerText = t.toFixed(1);
+  const base = demoAverages[g];
+  document.getElementById('hudTarget').innerText = `Target W: ${base.width} | D: ${base.depth}`;
+  updateGauge(w, base.width, 'gaugeWidth', 'warnWidth');
+  updateGauge(d, base.depth, 'gaugeDepth', 'warnDepth');
+  const mv = document.querySelector('model-viewer');
+  if (mv) { mv.setAttribute('scale', `${w/base.width} ${t/2.5} ${d/base.depth}`); }
+}
 
-            window.location.href = 'section3.html';
-        }
+function selectPlate(filename, idx) {
+  document.getElementById('plateViewer').src = filename;
+  [1,2,3].forEach(i => {
+    const btn = document.getElementById(`btnPlate${i}`);
+    const badge = document.getElementById(`badgePlate${i}`);
+    if (i === idx) {
+      btn.classList.add('active'); badge.style.display = 'inline-block';
+    } else {
+      btn.classList.remove('active'); badge.style.display = 'none';
+    }
+  });
+  localStorage.setItem('plate_model', filename);
+}
 
-        window.onload = () => {
-            checkInheritance();
-            updateSystem();
-            
-            // Auto-restore previous plate selection if returning from Section 3
-            const savedModel = localStorage.getItem('plate_model') || 'lockingplate1.gltf';
-            let activeIdx = 1;
-            if(savedModel === 'lockingplate2.glb') activeIdx = 2;
-            if(savedModel === 'lockingplate3.glb') activeIdx = 3;
-            selectPlate(savedModel, activeIdx);
-        };
-    </script>
+function saveAndProceed() {
+  localStorage.setItem('plate_width', document.getElementById('inputWidth').value);
+  localStorage.setItem('plate_depth', document.getElementById('inputDepth').value);
+  localStorage.setItem('plate_thick', document.getElementById('inputThick').value);
+  if (!localStorage.getItem('plate_model')) localStorage.setItem('plate_model', 'lockingplate1.gltf');
+  window.location.href = 'section3.html';
+}
+
+window.onload = () => {
+  checkInheritance(); updateSystem();
+  const saved = localStorage.getItem('plate_model') || 'lockingplate1.gltf';
+  let idx = 1;
+  if (saved.includes('lockingplate2')) idx = 2;
+  if (saved.includes('lockingplate3')) idx = 3;
+  selectPlate(saved, idx);
+  const sw = localStorage.getItem('plate_width');
+  const sd = localStorage.getItem('plate_depth');
+  const st = localStorage.getItem('plate_thick');
+  if (sw) document.getElementById('inputWidth').value = sw;
+  if (sd) document.getElementById('inputDepth').value = sd;
+  if (st) document.getElementById('inputThick').value = st;
+  updateSystem();
+};
+</script>
 </body>
-
 </html>

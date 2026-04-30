@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="mobile-web-app-capable" content="yes"><title>RadialPlate CDSS — FEA</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="header">
+  <div class="header-row"><div class="header-icon">⚡</div><div><div class="header-sub">Radial Plate CDSS</div><div class="header-title">Phase 3: FEA Prediction</div></div></div>
+  <div class="stepper">
+    <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Assess</div></div><div class="step-line done"></div>
+    <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Size</div></div><div class="step-line done"></div>
+    <div class="step active"><div class="step-dot">3</div><div class="step-lbl">FEA</div></div><div class="step-line"></div>
+    <div class="step idle"><div class="step-dot">4</div><div class="step-lbl">Guide</div></div><div class="step-line"></div>
+    <div class="step idle"><div class="step-dot">✓</div><div class="step-lbl">Report</div></div>
+  </div>
+</header>
+
+<div style="padding:16px">
+
+<!-- Status -->
+<div class="card" style="display:flex;align-items:center;gap:10px;padding:14px">
+  <div style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;flex-shrink:0"></div>
+  <div><div class="lbl" style="margin:0">Pipeline</div><div style="font-size:13px;font-weight:700;color:#f1f5f9" id="statusInheritance">Loading...</div></div>
+  <input type="hidden" id="sysMass" value="70"><input type="hidden" id="sysMultiplier" value="1.0">
+</div>
+
+<!-- Selected Plate Summary -->
+<div class="sec-title">🦴 Active Plate Model</div>
+<div class="card">
+  <div class="blueprint" style="border-radius:10px;height:160px;overflow:hidden;margin-bottom:12px">
+    <model-viewer id="selectedPlateViewer" src="lockingplate1.gltf" auto-rotate camera-controls style="width:100%;height:100%" exposure="1.2" shadow-intensity="1"></model-viewer>
+  </div>
+  <div style="font-size:16px;font-weight:800;color:#f1f5f9;margin-bottom:4px" id="plateNameDisplay">Standard Volar Plate</div>
+  <div style="font-size:12px;color:#64748b">CAD: <span style="color:#818cf8;font-weight:700" id="plateFileDisplay">lockingplate1.gltf</span> &nbsp;·&nbsp; FEA: <span style="color:#60a5fa;font-weight:700" id="plateDataDisplay">L1.txt</span></div>
+  <div style="font-size:11px;font-weight:700;margin-top:10px;padding:8px 10px;background:#0f172a;border-radius:8px;border:1px solid #334155" id="feaStatus">Connecting to FEA nodes...</div>
+</div>
+
+<!-- Force & Load Case -->
+<div class="sec-title">💪 Applied Load Case (FEA)</div>
+<div class="card">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px">
+    <div>
+      <div class="lbl">Selected Applied Load</div>
+      <div style="font-size:48px;font-weight:900;color:#f1f5f9;line-height:1"><span id="outForce">663</span><span style="font-size:20px;color:#64748b;font-weight:700"> N</span></div>
+    </div>
+    <div style="text-align:right;font-size:10px;font-weight:700;color:#10b981;padding:6px 10px;background:#0f172a;border-radius:8px;border:1px solid #334155">Table 10 Data</div>
+  </div>
+  <div class="lbl">FEA Load Case Selection</div>
+  <select id="loadSelect" class="inp" onchange="runFEAPrediction()">
+    <option value="26.3">26.3 N — Minimal Load (Forearm / Reference)</option>
+    <option value="663" selected>663 N — Physiological Load (Daily Activity)</option>
+    <option value="4000">4000 N — Maximum Load (Heavy Labor / Impact)</option>
+  </select>
+  <div style="font-size:11px;color:#64748b;margin-top:10px;line-height:1.5">Values sourced directly from FEA simulation (Table 10). Stress, deformation and contact pressure are exact simulation results.</div>
+</div>
+
+<!-- What-If Engine -->
+<div class="sec-title">🔧 What-If Engine</div>
+<div class="card" style="background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.25)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div><div class="lbl" style="color:#818cf8">Plate Thickness Override</div><div style="font-size:10px;color:#6366f1;font-weight:600">Bending stiffness scales cubically (h³)</div></div>
+    <div style="font-size:30px;font-weight:900;color:#818cf8"><span id="valThick">2.5</span><span style="font-size:12px;color:#6366f1"> mm</span></div>
+  </div>
+  <input type="range" id="inputThick" min="1.5" max="6.0" step="0.1" value="2.5" oninput="runFEAPrediction()">
+</div>
+
+<!-- FEA Result Card -->
+<div class="sec-title">📊 FEA Prediction Result</div>
+<div id="resultCard" class="card" style="border-width:2px">
+  <!-- Fracture Gap Sim -->
+  <div class="blueprint" style="border-radius:10px;padding:12px;margin-bottom:14px">
+    <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Fracture Gap Simulation</div>
+    <svg width="100%" height="90" viewBox="0 0 200 100">
+      <rect x="20" y="20" width="160" height="15" fill="#334155" rx="2"/>
+      <path d="M 20 35 L 90 35 C 95 35, 95 90, 90 90 L 20 90 Z" fill="#1e293b"/>
+      <path id="boneRight" d="M 110 35 L 180 35 L 180 90 L 110 90 C 105 90, 105 35, 110 35 Z" fill="#1e293b"/>
+      <line id="gapLine" x1="90" y1="60" x2="110" y2="60" stroke="#ef4444" stroke-width="2" stroke-dasharray="2,2"/>
+    </svg>
+  </div>
+  <div style="text-align:center;padding:14px 0">
+    <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Predicted Micromotion</div>
+    <div style="font-size:56px;font-weight:900;color:#f1f5f9" id="outDispText"><span id="outDisp">0.00</span><span style="font-size:18px;color:#64748b"> mm</span></div>
+    <div id="statusBadge" style="margin:10px auto 0;display:inline-block;padding:8px 20px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;background:#334155;color:#94a3b8">Calculating...</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid #334155;margin-top:10px;padding-top:14px">
+    <div style="text-align:center;padding:0 10px">
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase">Von Mises Stress</div>
+      <div style="font-size:22px;font-weight:900;color:#818cf8;margin-top:4px" id="outStressCont"><span id="outStress">0.0</span><span style="font-size:11px"> MPa</span></div>
+      <div style="font-size:9px;color:#475569;margin-top:2px">Yield: 860 MPa</div>
+    </div>
+    <div style="text-align:center;padding:0 10px;border-left:1px solid #334155">
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase">Contact Pressure</div>
+      <div style="font-size:22px;font-weight:900;color:#60a5fa;margin-top:4px"><span id="outPressure">0.0</span><span style="font-size:11px"> MPa</span></div>
+      <div style="font-size:9px;color:#475569;margin-top:2px">Bone-Plate Interface</div>
+    </div>
+  </div>
+</div>
+
+<!-- Micromotion Explainer -->
+<div class="card" style="background:#0f172a;border-color:#1e293b">
+  <div style="font-size:13px;font-weight:800;color:#f1f5f9;margin-bottom:8px">📘 What is Micromotion?</div>
+  <div style="font-size:12px;color:#94a3b8;line-height:1.6">Microscopic movement between bone fragments:<br>
+  <span style="color:#34d399;font-weight:700">0.2–1.0 mm:</span> Stimulates stem cells → biological callus → faster healing.<br>
+  <span style="color:#f87171;font-weight:700">&gt;2.0 mm:</span> Tears blood vessels → high non-union risk.
+  </div>
+</div>
+
+<!-- Clinical Recs -->
+<div class="sec-title">🩺 Clinical Recommendations</div>
+<div class="card" style="background:#0f172a;border-color:#1e293b">
+  <ul id="recList" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px"></ul>
+</div>
+
+<!-- Actions -->
+<button class="btn-back" onclick="window.location.href='section2.html'">← Return to Sizing</button>
+<button class="btn-primary" onclick="window.location.href='section4.html'">Proceed to Surgical Guide →</button>
+</div>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span><span class="nav-lbl">Assess</span></a>
+  <a class="nav-item" href="section2.html"><span class="nav-icon">📏</span><span class="nav-lbl">Size</span></a>
+  <a class="nav-item active" href="section3.html"><span class="nav-icon">⚡</span><span class="nav-lbl">FEA</span></a>
+  <a class="nav-item" href="section4.html"><span class="nav-icon">🔬</span><span class="nav-lbl">Guide</span></a>
+  <a class="nav-item" href="final_report.html"><span class="nav-icon">📋</span><span class="nav-lbl">Report</span></a>
+</nav>
+
+<script>
+const FEA_DATA={
+  'lockingplate1':{
+    26.3:{stress:29.329,deform:0.0528,pressure:6.996},
+    663:{stress:739.36,deform:1.3683,pressure:176.37},
+    4000:{stress:4460.70,deform:8.2551,pressure:1064.1}
+  },
+  'lockingplate2':{
+    26.3:{stress:17.276,deform:0.09297,pressure:6.2885},
+    663:{stress:435.5,deform:2.3438,pressure:158.53},
+    4000:{stress:2627.5,deform:14.141,pressure:956.4}
+  },
+  'lockingplate3':{
+    26.3:{stress:16.7,deform:0.07237,pressure:7.6492},
+    663:{stress:420.98,deform:1.8244,pressure:192.83},
+    4000:{stress:2539.9,deform:11.007,pressure:1163.4}
+  }
+};
+const BASE_THICK=2.5,LIMIT=2.0;
+function getKey(mdl){if(mdl.includes('lockingplate2'))return'lockingplate2';if(mdl.includes('lockingplate3'))return'lockingplate3';return'lockingplate1';}
+function initializeData(){
+  let thick=localStorage.getItem('plate_thick')||2.5;
+  let mdl=localStorage.getItem('plate_model')||'lockingplate1.gltf';
+  let savedLoad=localStorage.getItem('plate_load')||'663';
+  document.getElementById('inputThick').value=thick;
+  const ls=document.getElementById('loadSelect');
+  for(let i=0;i<ls.options.length;i++){if(ls.options[i].value===String(parseFloat(savedLoad))||parseFloat(ls.options[i].value)===parseFloat(savedLoad)){ls.selectedIndex=i;break;}}
+
+  const viewer=document.getElementById('selectedPlateViewer');
+  const fd=document.getElementById('plateFileDisplay');
+  const nd=document.getElementById('plateNameDisplay');
+  const dd=document.getElementById('plateDataDisplay');
+  const fs=document.getElementById('feaStatus');
+  viewer.src=mdl;fd.innerText=mdl;
+  let df="L1.txt";
+  if(mdl.includes('lockingplate1')){nd.innerText="Standard Volar Plate";df="L1.txt";FEA_BASE_DISP=8.255;}
+  else if(mdl.includes('lockingplate2')){nd.innerText="Juxta-Articular Plate";df="L2.txt";FEA_BASE_DISP=9.102;}
+  else if(mdl.includes('lockingplate3')){nd.innerText="Narrow Shaft Plate";df="L3.txt";FEA_BASE_DISP=7.850;}
+  dd.innerText=df;
+  fs.innerText="Loading FEA data from "+df+"...";
+  fs.style.cssText="font-size:11px;font-weight:700;color:#fbbf24;padding:8px 10px;background:#0f172a;border-radius:8px;border:1px solid #334155;margin-top:10px";
+  fetch(df).then(r=>{if(r.ok)return r.text();throw new Error("File not found");}).then(txt=>{
+    fs.innerText="Parsing FEA nodes...";
+    const lines=txt.split('\n');let maxD=0,vn=0,cx=0,cy=0,cz=0;
+    for(let i=0;i<lines.length;i++){const p=lines[i].trim().split(',');if(p.length>=4){const x=parseFloat(p[1]),y=parseFloat(p[2]),z=parseFloat(p[3]);if(!isNaN(x)&&!isNaN(y)&&!isNaN(z)){const m=Math.sqrt(x*x+y*y+z*z);if(m>maxD){maxD=m;cx=x;cy=y;cz=z;}vn++;}}}
+    if(maxD>0){FEA_BASE_DISP=maxD;fs.innerHTML=`✓ ${vn.toLocaleString()} nodes parsed. Peak: <b>${maxD.toFixed(3)} mm</b>`;}
+    else throw new Error("No nodes found");
+    runFEAPrediction();
+  }).catch(e=>{fs.innerText="⚠ "+e.message+" — using baseline estimates.";fs.style.color="#f87171";runFEAPrediction();});
+  const st=document.getElementById('statusInheritance');
+  if(localStorage.getItem('plate_multiplier')){st.innerText="Connected — Sections 1 & 2 active.";st.style.color="#34d399";}
+  else{st.innerText="Standalone Mode (defaults applied).";st.style.color="#fbbf24";}
+}
+
+function runFEAPrediction(){
+  let load=parseFloat(document.getElementById('loadSelect').value);
+  let thick=parseFloat(document.getElementById('inputThick').value);
+  let mdl=localStorage.getItem('plate_model')||'lockingplate1.gltf';
+  document.getElementById('valThick').innerText=thick.toFixed(1);
+  document.getElementById('outForce').innerText=load;
+  localStorage.setItem('plate_load',load);
+  const key=getKey(mdl);
+  const d=FEA_DATA[key][load];
+  // Scale by thickness: deformation ∝ 1/h³, stress ∝ 1/h²
+  const td=Math.pow(BASE_THICK/thick,3);
+  const ts=Math.pow(BASE_THICK/thick,2);
+  let disp=d.deform*td;
+  let stress=d.stress*ts;
+  let pres=d.pressure;
+  document.getElementById('outDisp').innerText=disp.toFixed(5);
+  document.getElementById('outPressure').innerText=pres.toFixed(2);
+  document.getElementById('outStress').innerText=stress.toFixed(1);
+  const sc=document.getElementById('outStressCont');
+  if(stress>600)sc.style.color='#f87171';else if(stress>350)sc.style.color='#fbbf24';else sc.style.color='#818cf8';
+  updateCDSS(disp,thick);updateVisualizer(disp);
+}
+function updateVisualizer(d){
+  const br=document.getElementById('boneRight');const gl=document.getElementById('gapLine');
+  let vs=Math.min(d*3,50);let nx=110+vs;
+  br.setAttribute('d',`M ${nx} 35 L ${nx+70} 35 L ${nx+70} 90 L ${nx} 90 C ${nx-5} 90, ${nx-5} 35, ${nx} 35 Z`);
+  gl.setAttribute('x2',nx);
+  gl.setAttribute('stroke',d>LIMIT?'#ef4444':d>1.0?'#f59e0b':'#10b981');
+}
+function updateCDSS(d,thick){
+  const card=document.getElementById('resultCard');
+  const txt=document.getElementById('outDispText');
+  const badge=document.getElementById('statusBadge');
+  const list=document.getElementById('recList');
+  list.innerHTML='';
+  if(d<=1.0){
+    card.style.cssText="border:2px solid #10b981;background:rgba(16,185,129,0.08);border-radius:16px;padding:20px;margin-bottom:16px";
+    txt.style.color='#34d399';badge.style.cssText="margin:10px auto 0;display:inline-block;padding:8px 20px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;background:#064e3b;color:#34d399";badge.innerText="Optimal Callus Formation";
+    list.innerHTML='<li style="display:flex;gap:10px;font-size:13px;color:#94a3b8"><span style="color:#34d399;font-size:16px">✓</span><span><strong style="color:#f1f5f9">Clearance:</strong> Construct is mechanically sound. Biological healing is highly supported.</span></li><li style="display:flex;gap:10px;font-size:13px;color:#94a3b8;margin-top:8px"><span style="color:#34d399;font-size:16px">✓</span><span><strong style="color:#f1f5f9">Action:</strong> Proceed with '+thick.toFixed(1)+'mm custom plate fabrication.</span></li>';
+  }else if(d<=LIMIT){
+    card.style.cssText="border:2px solid #f59e0b;background:rgba(245,158,11,0.08);border-radius:16px;padding:20px;margin-bottom:16px";
+    txt.style.color='#fbbf24';badge.style.cssText="margin:10px auto 0;display:inline-block;padding:8px 20px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;background:#451a03;color:#fbbf24";badge.innerText="Borderline Micromotion";
+    list.innerHTML='<li style="display:flex;gap:10px;font-size:13px;color:#94a3b8"><span style="color:#fbbf24;font-size:16px">⚠</span><span><strong style="color:#f1f5f9">Caution:</strong> Displacement elevated but remains biologically viable.</span></li><li style="display:flex;gap:10px;font-size:13px;color:#94a3b8;margin-top:8px"><span style="color:#818cf8;font-size:16px">→</span><span><strong style="color:#f1f5f9">Recommendation:</strong> Increase plate thickness via the What-If slider above.</span></li>';
+  }else{
+    card.style.cssText="border:2px solid #ef4444;background:rgba(239,68,68,0.08);border-radius:16px;padding:20px;margin-bottom:16px";
+    card.classList.add('pulse-red');txt.style.color='#f87171';badge.style.cssText="margin:10px auto 0;display:inline-block;padding:8px 20px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;background:#7f1d1d;color:#fca5a5";badge.innerText="Danger: Non-Union Risk";
+    list.innerHTML='<li style="display:flex;gap:10px;font-size:13px;color:#94a3b8"><span style="color:#f87171;font-size:16px">❌</span><span><strong style="color:#f1f5f9">Failure:</strong> Force will shear healing tissue, risking non-union.</span></li><li style="display:flex;gap:10px;font-size:13px;color:#94a3b8;margin-top:8px"><span style="color:#818cf8;font-size:16px">→</span><span><strong style="color:#f1f5f9">Primary Action:</strong> Increase plate thickness until warning clears.</span></li><li style="display:flex;gap:10px;font-size:13px;color:#94a3b8;margin-top:8px"><span style="color:#818cf8;font-size:16px">→</span><span><strong style="color:#f1f5f9">Secondary:</strong> If max thickness reached, restrict patient activity clinically.</span></li>';
+  }
+}
+window.onload=initializeData;
+</script>
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>RadialPlate CDSS — Size</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0f172a; min-height: 100vh; padding-bottom: 80px; }
+  ::-webkit-scrollbar { display: none; }
+  .stepper { display: flex; align-items: center; gap: 0; padding: 0 16px; }
+  .step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; z-index: 1; }
+  .step-active .step-dot { background: #6366f1; color: white; box-shadow: 0 0 0 4px rgba(99,102,241,0.25); }
+  .step-done .step-dot { background: #10b981; color: white; }
+  .step-inactive .step-dot { background: #1e293b; color: #64748b; border: 2px solid #334155; }
+  .step-label { font-size: 9px; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .step-active .step-label { color: #818cf8; }
+  .step-done .step-label { color: #34d399; }
+  .step-inactive .step-label { color: #475569; }
+  .step-line { flex: 1; height: 2px; background: #1e293b; margin-top: -16px; }
+  .step-line-done { background: #10b981; }
+  .card { background: #1e293b; border-radius: 16px; border: 1px solid #334155; padding: 20px; margin-bottom: 16px; }
+  .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 6px; }
+  .input-styled { width: 100%; padding: 12px 14px; background: #0f172a; border: 1.5px solid #334155; border-radius: 10px; color: #f1f5f9; font-size: 16px; font-weight: 700; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .input-styled:focus { border-color: #6366f1; }
+  select.input-styled { cursor: pointer; }
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #334155; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #6366f1; box-shadow: 0 2px 8px rgba(99,102,241,0.5); }
+  .gauge-track { height: 6px; background: #334155; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .gauge-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+  .plate-card { background: #0f172a; border-radius: 14px; border: 2px solid #334155; padding: 16px; cursor: pointer; transition: all 0.2s; flex: 1; min-width: 0; }
+  .plate-card.active { border-color: #6366f1; background: rgba(99,102,241,0.1); box-shadow: 0 0 0 4px rgba(99,102,241,0.15); }
+  .plate-badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #6366f1; color: white; display: inline-block; margin-bottom: 8px; }
+  .blueprint { background: #0f172a; background-image: linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px); background-size: 24px 24px; }
+  .snap-btn { font-size: 10px; font-weight: 700; padding: 4px 10px; background: #334155; color: #94a3b8; border-radius: 6px; border: none; cursor: pointer; }
+  .snap-btn:active { background: #6366f1; color: white; }
+  .btn-primary { width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 800; color: white; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(99,102,241,0.4); display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .btn-back { width: 100%; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 700; color: #94a3b8; background: #1e293b; border: 1.5px solid #334155; cursor: pointer; margin-bottom: 10px; }
+  .sec-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #6366f1; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: #1e293b; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15,23,42,0.97); backdrop-filter: blur(16px); border-top: 1px solid #1e293b; display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 4px; cursor: pointer; text-decoration: none; }
+  .nav-icon { font-size: 20px; margin-bottom: 2px; }
+  .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .nav-item.active .nav-label { color: #818cf8; }
+  .nav-item:not(.active) .nav-label { color: #475569; }
+</style>
+</head>
+<body>
+
+<header style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%); padding: 24px 20px 20px;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+    <div style="width:40px;height:40px;background:rgba(99,102,241,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">📏</div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:0.1em;">Radial Plate CDSS</div>
+      <div style="font-size:18px;font-weight:900;color:white;">Phase 2: Sizing</div>
+    </div>
+  </div>
+  <div class="stepper">
+    <div class="step step-done"><div class="step-dot">✓</div><div class="step-label">Assess</div></div>
+    <div class="step-line step-line-done"></div>
+    <div class="step step-active"><div class="step-dot">2</div><div class="step-label">Size</div></div>
+    <div class="step-line"></div>
+    <div class="step step-inactive"><div class="step-dot">3</div><div class="step-label">FEA</div></div>
+    <div class="step-line"></div>
+    <div class="step step-inactive"><div class="step-dot">4</div><div class="step-label">Guide</div></div>
+    <div class="step-line"></div>
+    <div class="step step-inactive"><div class="step-dot">✓</div><div class="step-label">Report</div></div>
+  </div>
+</header>
+
+<!-- Status Banner -->
+<div style="margin:16px;padding:14px;background:#1e293b;border-radius:12px;border:1px solid #334155;display:flex;align-items:center;justify-content:space-between;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;flex-shrink:0;"></div>
+    <div>
+      <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Data Pipeline</div>
+      <div style="font-size:13px;font-weight:700;color:#f1f5f9;" id="statusInheritance">Checking patient data...</div>
+    </div>
+  </div>
+  <select id="inputGender" class="input-styled" style="width:auto;font-size:13px;padding:8px 10px;" onchange="updateSystem()">
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+</div>
+
+<div style="padding:0 16px;">
+
+  <!-- Step 1: Choose Plate -->
+  <div class="sec-title">① Choose Implant Model</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+
+    <button onclick="selectPlate('lockingplate1.gltf',1)" id="btnPlate1" class="plate-card active" style="text-align:left;">
+      <div class="plate-badge" id="badgePlate1">ACTIVE</div>
+      <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">Standard Volar Plate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;">3-hole distal span. Optimised for simple extra-articular fractures with classic contouring.</div>
+    </button>
+
+    <button onclick="selectPlate('lockingplate2.glb',2)" id="btnPlate2" class="plate-card" style="text-align:left;">
+      <div class="plate-badge" id="badgePlate2" style="display:none;">ACTIVE</div>
+      <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">Juxta-Articular Plate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;">Wider footprint for complex intra-articular fractures. Enhanced subchondral support.</div>
+    </button>
+
+    <button onclick="selectPlate('lockingplate3.glb',3)" id="btnPlate3" class="plate-card" style="text-align:left;">
+      <div class="plate-badge" id="badgePlate3" style="display:none;">ACTIVE</div>
+      <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">Narrow Shaft Plate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;">Extended diaphyseal length, narrow profile. For smaller anatomy or long oblique fractures.</div>
+    </button>
+
+  </div>
+
+  <!-- 3D Viewer -->
+  <div class="blueprint" style="border-radius:16px;border:1px solid #334155;height:260px;margin-bottom:16px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:10px;left:10px;background:rgba(15,23,42,0.85);padding:6px 10px;border-radius:8px;z-index:10;border:1px solid #334155;">
+      <div style="font-size:9px;font-weight:800;color:#818cf8;text-transform:uppercase;">AR Ready · 3D View</div>
+      <div style="font-size:11px;font-weight:700;color:#f1f5f9;" id="hudTarget">Target W: 31.6 | D: 20.2</div>
+    </div>
+    <model-viewer id="plateViewer" src="lockingplate1.gltf" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" shadow-intensity="1" exposure="1.2" auto-rotate rotation-per-second="30deg" style="width:100%;height:100%;" alt="3D locking plate model">
+      <button slot="ar-button" style="position:absolute;bottom:10px;right:10px;background:#6366f1;color:white;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">View AR</button>
+    </model-viewer>
+  </div>
+
+  <!-- Step 2: Parametric Sizing -->
+  <div class="sec-title">② Parametric Sizing</div>
+  <div class="card">
+    <!-- Width -->
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div class="label">Distal Volar Width</div>
+          <button class="snap-btn" onclick="snapToAverage('width')">Snap to Avg</button>
+        </div>
+        <div style="font-size:26px;font-weight:900;color:#6366f1;"><span id="valWidth">30</span><span style="font-size:12px;color:#64748b;"> mm</span></div>
+      </div>
+      <input type="range" id="inputWidth" min="20" max="45" value="30" oninput="updateSystem()">
+      <div class="gauge-track"><div id="gaugeWidth" class="gauge-fill" style="width:0%;background:#10b981;"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:10px;color:#64748b;">Deviation</span>
+        <span style="font-size:10px;font-weight:700;color:#10b981;" id="warnWidth">0%</span>
+      </div>
+    </div>
+    <!-- Depth -->
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div class="label">Distal Depth (AP)</div>
+          <button class="snap-btn" onclick="snapToAverage('depth')">Snap to Avg</button>
+        </div>
+        <div style="font-size:26px;font-weight:900;color:#6366f1;"><span id="valDepth">20</span><span style="font-size:12px;color:#64748b;"> mm</span></div>
+      </div>
+      <input type="range" id="inputDepth" min="10" max="35" value="20" oninput="updateSystem()">
+      <div class="gauge-track"><div id="gaugeDepth" class="gauge-fill" style="width:0%;background:#10b981;"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:10px;color:#64748b;">Deviation</span>
+        <span style="font-size:10px;font-weight:700;color:#10b981;" id="warnDepth">0%</span>
+      </div>
+    </div>
+    <!-- Thickness -->
+    <div style="background:rgba(99,102,241,0.08);border-radius:12px;padding:14px;border:1px solid rgba(99,102,241,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div class="label" style="color:#818cf8;">Plate Thickness</div>
+          <div style="font-size:9px;color:#6366f1;font-weight:600;text-transform:uppercase;">Directly modifies FEA stability</div>
+        </div>
+        <div style="font-size:30px;font-weight:900;color:#818cf8;"><span id="valThick">2.5</span><span style="font-size:12px;color:#6366f1;"> mm</span></div>
+      </div>
+      <input type="range" id="inputThick" min="1.5" max="5.0" step="0.1" value="2.5" style="accent-color:#6366f1;" oninput="updateSystem()">
+    </div>
+  </div>
+
+  <!-- Warning -->
+  <div style="background:#2d1b00;border:1px solid #92400e;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;">
+    <span style="font-size:20px;">⚠️</span>
+    <p style="font-size:12px;color:#fcd34d;font-weight:600;line-height:1.5;margin:0;"><strong>Warning:</strong> Ensure the plate footprint does not exceed the distal width bounding box to avoid overlapping the radioulnar joint.</p>
+  </div>
+
+  <!-- Actions -->
+  <button class="btn-back" onclick="goBack()">← Return to Assessment</button>
+  <button class="btn-primary" onclick="saveAndProceed()">Save & Proceed to FEA Prediction →</button>
+
+</div>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span><span class="nav-label">Assess</span></a>
+  <a class="nav-item active" href="section2.html"><span class="nav-icon">📏</span><span class="nav-label">Size</span></a>
+  <a class="nav-item" href="section3.html"><span class="nav-icon">⚡</span><span class="nav-label">FEA</span></a>
+  <a class="nav-item" href="section4.html"><span class="nav-icon">🔬</span><span class="nav-label">Guide</span></a>
+  <a class="nav-item" href="final_report.html"><span class="nav-icon">📋</span><span class="nav-label">Report</span></a>
+</nav>
+
+<script>
+const demoAverages = { "Male":{width:31.6,depth:20.2}, "Female":{width:27.1,depth:16.9} };
+
+function goBack() {
+  localStorage.setItem('plate_width', document.getElementById('inputWidth').value);
+  localStorage.setItem('plate_depth', document.getElementById('inputDepth').value);
+  localStorage.setItem('plate_thick', document.getElementById('inputThick').value);
+  window.location.href = 'index.html';
+}
+
+function checkInheritance() {
+  let savedGender = localStorage.getItem('plate_gender');
+  const statusEl = document.getElementById('statusInheritance');
+  const genderSelect = document.getElementById('inputGender');
+  if (savedGender) {
+    statusEl.innerText = "Data linked from Phase 1.";
+    statusEl.style.color = "#34d399";
+    genderSelect.value = savedGender;
+    genderSelect.disabled = true;
+    genderSelect.style.opacity = "0.5";
+  } else {
+    statusEl.innerText = "Manual Testing Mode.";
+    statusEl.style.color = "#fbbf24";
+  }
+}
+
+function snapToAverage(dim) {
+  const g = document.getElementById('inputGender').value;
+  const avg = demoAverages[g][dim];
+  if (dim === 'width') document.getElementById('inputWidth').value = avg;
+  if (dim === 'depth') document.getElementById('inputDepth').value = avg;
+  updateSystem();
+}
+
+function updateGauge(current, baseline, gaugeId, warnId) {
+  const gauge = document.getElementById(gaugeId);
+  const warn = document.getElementById(warnId);
+  const dev = (Math.abs(current - baseline) / baseline) * 100;
+  gauge.style.width = Math.min(dev * 3, 100) + '%';
+  if (dev <= 5) { gauge.style.background = '#10b981'; warn.innerText = `Dev: ${dev.toFixed(1)}% (Optimal)`; warn.style.color = '#34d399'; }
+  else if (dev <= 15) { gauge.style.background = '#f59e0b'; warn.innerText = `Dev: ${dev.toFixed(1)}% (Acceptable)`; warn.style.color = '#fbbf24'; }
+  else { gauge.style.background = '#ef4444'; warn.innerText = `Dev: ${dev.toFixed(1)}% (Warning)`; warn.style.color = '#f87171'; }
+}
+
+function updateSystem() {
+  const g = document.getElementById('inputGender').value;
+  const w = parseFloat(document.getElementById('inputWidth').value);
+  const d = parseFloat(document.getElementById('inputDepth').value);
+  const t = parseFloat(document.getElementById('inputThick').value);
+  document.getElementById('valWidth').innerText = w;
+  document.getElementById('valDepth').innerText = d;
+  document.getElementById('valThick').innerText = t.toFixed(1);
+  const base = demoAverages[g];
+  document.getElementById('hudTarget').innerText = `Target W: ${base.width} | D: ${base.depth}`;
+  updateGauge(w, base.width, 'gaugeWidth', 'warnWidth');
+  updateGauge(d, base.depth, 'gaugeDepth', 'warnDepth');
+  const mv = document.querySelector('model-viewer');
+  if (mv) { mv.setAttribute('scale', `${w/base.width} ${t/2.5} ${d/base.depth}`); }
+}
+
+function selectPlate(filename, idx) {
+  document.getElementById('plateViewer').src = filename;
+  [1,2,3].forEach(i => {
+    const btn = document.getElementById(`btnPlate${i}`);
+    const badge = document.getElementById(`badgePlate${i}`);
+    if (i === idx) {
+      btn.classList.add('active'); badge.style.display = 'inline-block';
+    } else {
+      btn.classList.remove('active'); badge.style.display = 'none';
+    }
+  });
+  localStorage.setItem('plate_model', filename);
+}
+
+function saveAndProceed() {
+  localStorage.setItem('plate_width', document.getElementById('inputWidth').value);
+  localStorage.setItem('plate_depth', document.getElementById('inputDepth').value);
+  localStorage.setItem('plate_thick', document.getElementById('inputThick').value);
+  if (!localStorage.getItem('plate_model')) localStorage.setItem('plate_model', 'lockingplate1.gltf');
+  window.location.href = 'section3.html';
+}
+
+window.onload = () => {
+  checkInheritance(); updateSystem();
+  const saved = localStorage.getItem('plate_model') || 'lockingplate1.gltf';
+  let idx = 1;
+  if (saved.includes('lockingplate2')) idx = 2;
+  if (saved.includes('lockingplate3')) idx = 3;
+  selectPlate(saved, idx);
+  const sw = localStorage.getItem('plate_width');
+  const sd = localStorage.getItem('plate_depth');
+  const st = localStorage.getItem('plate_thick');
+  if (sw) document.getElementById('inputWidth').value = sw;
+  if (sd) document.getElementById('inputDepth').value = sd;
+  if (st) document.getElementById('inputThick').value = st;
+  updateSystem();
+};
+</script>
+</body>
+</html>

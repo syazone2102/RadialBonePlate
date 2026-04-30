@@ -1,258 +1,210 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radial Plate Calculator - Final Report</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .blueprint-bg {
-            background-color: #f8fafc;
-            background-image: linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        @media print {
-            body {
-                background-color: white !important;
-                padding: 0 !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .shadow-2xl, .shadow-md, .shadow-sm {
-                box-shadow: none !important;
-                border: 1px solid #e2e8f0 !important;
-            }
-            .print-break {
-                page-break-before: always;
-            }
-        }
-    </style>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="mobile-web-app-capable" content="yes"><title>RadialPlate CDSS — Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+@media print{body{background:#fff;color:#000;padding:0}.no-print{display:none!important}.bottom-nav{display:none!important}.header{background:#1e293b!important;print-color-adjust:exact}.card{border:1px solid #e2e8f0!important;background:#fff!important}.sec-title{color:#4f46e5!important}.print-break{page-break-before:always}}
+</style>
 </head>
+<body>
+<header class="header" style="position:relative">
+  <div class="header-row">
+    <div class="header-icon">📋</div>
+    <div><div class="header-sub">Radial Plate CDSS</div><div class="header-title">Pre-Surgical Report</div></div>
+  </div>
+  <div class="stepper">
+    <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Assess</div></div><div class="step-line done"></div>
+    <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Size</div></div><div class="step-line done"></div>
+    <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">FEA</div></div><div class="step-line done"></div>
+    <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Guide</div></div><div class="step-line done"></div>
+    <div class="step active"><div class="step-dot">📋</div><div class="step-lbl">Report</div></div>
+  </div>
+</header>
 
-<body class="bg-slate-100 font-sans p-4 md:p-8 min-h-screen flex justify-center">
+<div style="padding:16px">
 
-    <div class="max-w-4xl w-full bg-white shadow-2xl rounded-xl overflow-hidden p-8 md:p-12 border border-slate-200">
-        
-        <!-- HEADER -->
-        <header class="flex justify-between items-end border-b-4 border-indigo-900 pb-6 mb-8">
-            <div>
-                <h1 class="text-3xl font-black text-slate-900 tracking-tight">PRE-SURGICAL DESIGN REPORT</h1>
-                <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mt-2">Customized Radial Bone Locking Plate</p>
-            </div>
-            <div class="text-right">
-                <p class="text-sm text-slate-500 font-bold" id="reportDate">Generated: --/--/----</p>
-                <button onclick="window.print()" class="no-print mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 text-sm font-bold rounded-lg shadow transition-colors flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                    </svg>
-                    Print to PDF
-                </button>
-            </div>
-        </header>
-
-        <!-- SECTION 1: Demographics -->
-        <section class="mb-10">
-            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
-                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">1</span>
-                Clinical Load Assessment
-            </h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-slate-50 p-4 rounded border border-slate-200 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Biological Sex</p>
-                    <p class="text-xl font-bold text-slate-800" id="repGender">Male</p>
-                </div>
-                <div class="bg-slate-50 p-4 rounded border border-slate-200 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Patient Mass</p>
-                    <p class="text-xl font-bold text-slate-800"><span id="repMass">70</span> kg</p>
-                </div>
-                <div class="bg-blue-50 p-4 rounded border border-blue-200 text-center md:col-span-2">
-                    <p class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Dynamic Load Multiplier</p>
-                    <p class="text-2xl font-black text-blue-700"><span id="repMultiplier">1.0</span>x</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 2: Dimensions -->
-        <section class="mb-10">
-            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
-                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">2</span>
-                Implant Customization Data
-            </h2>
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="w-full md:w-1/2 flex flex-col justify-center gap-4">
-                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                        <span class="text-sm font-bold text-slate-600">Selected Plate CAD</span>
-                        <span class="font-black text-indigo-600 text-xs text-right w-1/2" id="repModel">Standard Volar Plate</span>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                        <span class="text-sm font-bold text-slate-600">Distal Width</span>
-                        <span class="font-black text-slate-800"><span id="repWidth">31.6</span> mm</span>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-slate-200 pb-2 bg-indigo-50 p-2 rounded">
-                        <span class="text-sm font-black text-indigo-800">Final Plate Thickness</span>
-                        <span class="font-black text-indigo-600"><span id="repThick">2.5</span> mm</span>
-                    </div>
-                </div>
-                <div class="w-full md:w-1/2 bg-slate-50 border border-slate-200 p-4 rounded flex items-center justify-center">
-                    <p class="text-sm font-medium text-slate-500 italic text-center">3D Structural dimensions are digitally configured based on the parametric values. Bending stiffness scales cubically against the base model based on the selected <span id="repThickQuote" class="font-bold">2.5</span>mm thickness.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3: Structural Outcomes -->
-        <section class="mb-10 print-break">
-            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
-                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">3</span>
-                FEA Structural Prediction Outcome
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="blueprint-bg p-6 border border-slate-200 rounded text-center shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Micromotion Yield</p>
-                    <p class="text-4xl font-black text-slate-800 drop-shadow"><span id="repDisp">0.00</span><span class="text-base font-bold ml-1">mm</span></p>
-                    <p class="text-[9px] text-slate-400 mt-2">FEA Baseline: <span id="repFeaBase">8.255</span>mm</p>
-                </div>
-                <div class="bg-white p-6 border border-slate-200 rounded text-center shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Von Mises Stress</p>
-                    <p class="text-4xl font-black text-indigo-700 drop-shadow"><span id="repStress">0.0</span><span class="text-base font-bold ml-1">MPa</span></p>
-                    <p class="text-[9px] text-slate-400 mt-2">Yield Limit: 860 MPa</p>
-                </div>
-                <div class="bg-white p-6 border border-slate-200 rounded text-center shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Contact Pressure</p>
-                    <p class="text-4xl font-black text-blue-700 drop-shadow"><span id="repPressure">0.0</span><span class="text-base font-bold ml-1">MPa</span></p>
-                    <p class="text-[9px] text-slate-400 mt-2">Bone-Plate Interface</p>
-                </div>
-            </div>
-            <div id="repCard" class="p-6 rounded-xl border-2">
-                <h3 class="font-bold text-lg mb-1 flex items-center gap-2" id="repStatusLabel">Calculating...</h3>
-                <p class="text-sm opacity-90 leading-relaxed" id="repStatusDesc">Analyzing mechanical thresholds against the 2.0mm high-risk non-union limit and checking structural failure margins.</p>
-            </div>
-        </section>
-
-        <!-- SECTION 4: Engineering Calculations -->
-        <section class="mb-6 print-break">
-            <h2 class="text-lg font-bold text-indigo-900 border-b border-indigo-100 pb-2 mb-4 flex items-center gap-2">
-                <span class="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-xs font-black">4</span>
-                Mathematical Methodology Summary
-            </h2>
-            <div class="bg-slate-50 border border-slate-200 rounded p-6">
-                <div class="space-y-4">
-                    <div class="border-l-4 border-slate-300 pl-4 bg-white p-3 rounded shadow-sm">
-                        <h4 class="font-bold text-slate-800 text-sm">1. Target Patient Force</h4>
-                        <p class="text-xs text-slate-600 mt-1 font-[monospace]">Force = <span id="repMathMass">70</span>kg × 9.81m/s² × <span id="repMathMult">1.0</span>x = <strong class="text-indigo-600"><span id="repMathForce">686</span> N</strong></p>
-                    </div>
-                    <div class="border-l-4 border-slate-300 pl-4 bg-white p-3 rounded shadow-sm">
-                        <h4 class="font-bold text-slate-800 text-sm">2. Structural Area Moment of Inertia Scalar</h4>
-                        <p class="text-xs text-slate-600 mt-1 font-[monospace]">Scalar = (2.5mm / <span id="repMathThick">2.5</span>mm)³ = <strong class="text-indigo-600"><span id="repMathScalar">1.000</span></strong></p>
-                    </div>
-                    <div class="border-l-4 border-indigo-300 pl-4 bg-white p-3 rounded shadow-sm">
-                        <h4 class="font-bold text-indigo-900 text-sm">3. Final Analytical Displacement Prediction</h4>
-                        <p class="text-xs text-slate-600 mt-1 font-[monospace]">Micromotion = <span id="repMathBase">8.255</span>mm × (<span id="repMathForce2">686</span>N / 500N) × <span id="repMathScalar2">1.000</span> = <strong class="text-indigo-600 text-base"><span id="repMathFinal">11.33</span> mm</strong></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="mt-12 text-center text-xs text-slate-400 font-bold border-t border-slate-200 pt-6">
-            GENERATED BY RADIAL BONE PLATE CLINICAL DECISION SUPPORT SYSTEM <br>
-            <span class="font-normal no-print text-blue-500 mt-2 block cursor-pointer" onclick="window.location.href='index.html'">Start New Calculation</span>
-        </footer>
-
+<!-- Report Header -->
+<div class="card" style="border-color:rgba(99,102,241,0.4);background:rgba(99,102,241,0.08)">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:18px;font-weight:900;color:#f1f5f9">PRE-SURGICAL DESIGN REPORT</div>
+      <div style="font-size:11px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Customized Radial Bone Locking Plate</div>
     </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:#64748b;font-weight:600" id="reportDate">--/--/----</div>
+      <button onclick="window.print()" class="no-print" style="margin-top:8px;background:#6366f1;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🖨 Print PDF</button>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // Data Formatting & Injection
-        window.onload = () => {
-            // Timestamp
-            const d = new Date();
-            document.getElementById('reportDate').innerText = `Generated: ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+<!-- Section 1: Demographics -->
+<div class="sec-title">① Clinical Load Assessment</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+  <div class="card" style="text-align:center;padding:14px">
+    <div class="lbl">Biological Sex</div>
+    <div style="font-size:20px;font-weight:900;color:#f1f5f9" id="repGender">--</div>
+  </div>
+  <div class="card" style="text-align:center;padding:14px">
+    <div class="lbl">Patient Mass</div>
+    <div style="font-size:20px;font-weight:900;color:#f1f5f9"><span id="repMass">70</span> kg</div>
+  </div>
+    <div class="card" style="text-align:center;padding:14px;grid-column:span 2;background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.25)">
+    <div class="lbl" style="color:#818cf8">Applied FEA Load (Table 10)</div>
+    <div style="font-size:28px;font-weight:900;color:#818cf8"><span id="repMultiplier">663</span> N</div>
+  </div>
+</div>
 
-            // Load Data
-            let gender = localStorage.getItem('plate_gender') || 'Male';
-            let mass = parseFloat(localStorage.getItem('plate_mass')) || 70.0;
-            let multiplier = parseFloat(localStorage.getItem('plate_multiplier')) || 1.0;
-            let width = parseFloat(localStorage.getItem('plate_width')) || 31.6;
-            let thick = parseFloat(localStorage.getItem('plate_thick')) || 2.5;
-            let model = localStorage.getItem('plate_model') || 'lockingplate1.gltf';
+<!-- Section 2: Implant -->
+<div class="sec-title print-break">② Implant Customization</div>
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #334155">
+      <span style="font-size:13px;font-weight:700;color:#94a3b8">Plate CAD Model</span>
+      <span style="font-size:13px;font-weight:800;color:#818cf8;text-align:right;max-width:60%" id="repModel">--</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #334155">
+      <span style="font-size:13px;font-weight:700;color:#94a3b8">Distal Width</span>
+      <span style="font-size:16px;font-weight:900;color:#f1f5f9"><span id="repWidth">31.6</span> mm</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(99,102,241,0.1);border-radius:8px">
+      <span style="font-size:13px;font-weight:800;color:#818cf8">Final Plate Thickness</span>
+      <span style="font-size:18px;font-weight:900;color:#818cf8"><span id="repThick">2.5</span> mm</span>
+    </div>
+  </div>
+</div>
 
-            // Execute FEA Engine Model Checking
-            let FEA_BASE_DISP = 8.255;
-            let plateName = "Standard Volar Plate (lockingplate1.gltf)";
-            if(model.includes('lockingplate2')) {
-                FEA_BASE_DISP = 9.102;
-                plateName = "Juxta-Articular Plate (lockingplate2.glb)";
-            } else if(model.includes('lockingplate3')) {
-                FEA_BASE_DISP = 7.850;
-                plateName = "Narrow Shaft Plate (lockingplate3.glb)";
-            }
+<!-- Section 3: FEA Outcomes -->
+<div class="sec-title print-break">③ FEA Structural Prediction</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+  <div class="card" style="text-align:center;padding:12px">
+    <div class="lbl">Micromotion</div>
+    <div style="font-size:22px;font-weight:900;color:#f1f5f9"><span id="repDisp">0.00</span><span style="font-size:11px;color:#64748b"> mm</span></div>
+    <div style="font-size:9px;color:#475569;margin-top:4px">FEA Base: <span id="repFeaBase">8.255</span>mm</div>
+  </div>
+  <div class="card" style="text-align:center;padding:12px">
+    <div class="lbl">Von Mises</div>
+    <div style="font-size:22px;font-weight:900;color:#818cf8"><span id="repStress">0.0</span><span style="font-size:11px"> MPa</span></div>
+    <div style="font-size:9px;color:#475569;margin-top:4px">Yield: 860 MPa</div>
+  </div>
+  <div class="card" style="text-align:center;padding:12px">
+    <div class="lbl">Contact P.</div>
+    <div style="font-size:22px;font-weight:900;color:#60a5fa"><span id="repPressure">0.0</span><span style="font-size:11px"> MPa</span></div>
+    <div style="font-size:9px;color:#475569;margin-top:4px">Bone-Plate</div>
+  </div>
+</div>
+<div id="repCard" class="card" style="border-width:2px;margin-bottom:16px">
+  <div style="font-size:15px;font-weight:800;color:#f1f5f9;margin-bottom:6px" id="repStatusLabel">Calculating...</div>
+  <div style="font-size:12px;color:#94a3b8;line-height:1.6" id="repStatusDesc">Analyzing mechanical thresholds...</div>
+</div>
 
-            // Fill HTML
-            document.getElementById('repGender').innerText = gender;
-            document.getElementById('repMass').innerText = mass;
-            document.getElementById('repMultiplier').innerText = multiplier.toFixed(2);
-            document.getElementById('repModel').innerText = plateName;
-            document.getElementById('repWidth').innerText = width.toFixed(1);
-            document.getElementById('repThick').innerText = thick.toFixed(1);
-            document.getElementById('repThickQuote').innerText = thick.toFixed(1);
-            document.getElementById('repFeaBase').innerText = FEA_BASE_DISP.toFixed(3);
+<!-- Section 4: Math -->
+<div class="sec-title">④ Mathematical Methodology</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+  <div class="card" style="padding:12px;border-left:3px solid #334155">
+    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px">1. Target Patient Force</div>
+    <div style="font-family:monospace;font-size:11px;color:#94a3b8">Force = <span id="repMathMass">70</span>kg × 9.81 × <span id="repMathMult">1.0</span> = <strong style="color:#818cf8"><span id="repMathForce">686</span> N</strong></div>
+  </div>
+  <div class="card" style="padding:12px;border-left:3px solid #334155">
+    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px">2. Inertia Scalar</div>
+    <div style="font-family:monospace;font-size:11px;color:#94a3b8">Scalar = (2.5 / <span id="repMathThick">2.5</span>)³ = <strong style="color:#818cf8"><span id="repMathScalar">1.000</span></strong></div>
+  </div>
+  <div class="card" style="padding:12px;border-left:3px solid #6366f1">
+    <div style="font-size:11px;font-weight:700;color:#818cf8;margin-bottom:4px">3. Final Micromotion</div>
+    <div style="font-family:monospace;font-size:11px;color:#94a3b8">Yield = <span id="repMathBase">8.255</span> × (<span id="repMathForce2">686</span>/500) × <span id="repMathScalar2">1.000</span> = <strong style="color:#818cf8;font-size:13px"><span id="repMathFinal">11.33</span> mm</strong></div>
+  </div>
+</div>
 
-            const FEA_REF_LOAD = 500;
-            const BASE_PLATE_THICKNESS = 2.5;
+<!-- Footer -->
+<div class="card" style="text-align:center;padding:16px;background:#0f172a;border-color:#1e293b">
+  <div style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em">Generated by Radial Bone Plate CDSS</div>
+  <button onclick="window.location.href='index.html'" class="no-print" style="margin-top:10px;background:transparent;border:1px solid #334155;color:#818cf8;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Start New Calculation</button>
+</div>
 
-            let force = mass * 9.81 * multiplier;
-            let forceFactor = force / FEA_REF_LOAD;
-            let thicknessFactor = Math.pow((BASE_PLATE_THICKNESS / thick), 3);
-            let disp = FEA_BASE_DISP * forceFactor * thicknessFactor;
-            
-            // Calculate Von Mises & Pressure
-            let areaFactor = 28.0 / width;
-            let finalPressure = 2.4 * forceFactor * areaFactor;
+</div>
 
-            let BASE_STRESS = 145.0; 
-            if (model.includes('lockingplate2')) { BASE_STRESS = 162.5; }
-            else if (model.includes('lockingplate3')) { BASE_STRESS = 185.0; } 
-            
-            let stressThickFactor = Math.pow(BASE_PLATE_THICKNESS / thick, 2);
-            let finalStress = BASE_STRESS * forceFactor * stressThickFactor;
+<nav class="bottom-nav no-print">
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span><span class="nav-lbl">Assess</span></a>
+  <a class="nav-item" href="section2.html"><span class="nav-icon">📏</span><span class="nav-lbl">Size</span></a>
+  <a class="nav-item" href="section3.html"><span class="nav-icon">⚡</span><span class="nav-lbl">FEA</span></a>
+  <a class="nav-item" href="section4.html"><span class="nav-icon">🔬</span><span class="nav-lbl">Guide</span></a>
+  <a class="nav-item active" href="final_report.html"><span class="nav-icon">📋</span><span class="nav-lbl">Report</span></a>
+</nav>
 
-            document.getElementById('repDisp').innerText = disp.toFixed(2);
-            document.getElementById('repPressure').innerText = finalPressure.toFixed(2);
-            document.getElementById('repStress').innerText = finalStress.toFixed(1);
-            
-            // Fill Mathematical Section
-            document.getElementById('repMathMass').innerText = mass;
-            document.getElementById('repMathMult').innerText = multiplier.toFixed(2);
-            document.getElementById('repMathForce').innerText = force.toFixed(0);
-            document.getElementById('repMathForce2').innerText = force.toFixed(0);
-            document.getElementById('repMathThick').innerText = thick.toFixed(1);
-            document.getElementById('repMathScalar').innerText = thicknessFactor.toFixed(3);
-            document.getElementById('repMathScalar2').innerText = thicknessFactor.toFixed(3);
-            document.getElementById('repMathBase').innerText = FEA_BASE_DISP.toFixed(3);
-            document.getElementById('repMathFinal').innerText = disp.toFixed(2);
-
-            // Apply Conditional Card Logic
-            const card = document.getElementById('repCard');
-            const label = document.getElementById('repStatusLabel');
-            const desc = document.getElementById('repStatusDesc');
-
-            if (disp <= 1.0) {
-                card.className = "p-6 rounded-xl border-2 bg-emerald-50 border-emerald-400 text-emerald-800";
-                label.innerHTML = `<span class="text-2xl">✓</span> CLEARED: Optimal Callus Formation`;
-                desc.innerText = "Construct mechanical clearance is fully viable. The fracture gap has controlled micromotion highly conducive to biological healing.";
-            } else if (disp <= 2.0) {
-                card.className = "p-6 rounded-xl border-2 bg-amber-50 border-amber-400 text-amber-800";
-                label.innerHTML = `<span class="text-2xl">⚠</span> BORDERLINE: Caution Advised`;
-                desc.innerText = "Displacement is elevated. It remains biologically viable, but post-surgical rehabilitation loading must be highly restricted.";
-            } else {
-                card.className = "p-6 rounded-xl border-2 bg-red-50 border-red-500 text-red-800";
-                label.innerHTML = `<span class="text-2xl">❌</span> WARNING: Non-Union Risk`;
-                desc.innerText = "Calculated maximum displacement breaches the 2.0mm threshold. Mechanical shear forces completely undermine secondary bone healing. Custom plate must be physically reinforced.";
-            }
-        };
-    </script>
-</body>
-
-</html>
+<script>
+const FEA_DATA={
+  'lockingplate1':{
+    26.3:{stress:29.329,deform:0.0528,pressure:6.996},
+    663:{stress:739.36,deform:1.3683,pressure:176.37},
+    4000:{stress:4460.70,deform:8.2551,pressure:1064.1}
+  },
+  'lockingplate2':{
+    26.3:{stress:17.276,deform:0.09297,pressure:6.2885},
+    663:{stress:435.5,deform:2.3438,pressure:158.53},
+    4000:{stress:2627.5,deform:14.141,pressure:956.4}
+  },
+  'lockingplate3':{
+    26.3:{stress:16.7,deform:0.07237,pressure:7.6492},
+    663:{stress:420.98,deform:1.8244,pressure:192.83},
+    4000:{stress:2539.9,deform:11.007,pressure:1163.4}
+  }
+};
+const BASE_THICK=2.5;
+function getKey(m){if(m.includes('lockingplate2'))return'lockingplate2';if(m.includes('lockingplate3'))return'lockingplate3';return'lockingplate1';}
+window.onload=()=>{
+  const d=new Date();
+  document.getElementById('reportDate').innerText=`Generated: ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+  let gender=localStorage.getItem('plate_gender')||'Male';
+  let mass=parseFloat(localStorage.getItem('plate_mass'))||70;
+  let load=parseFloat(localStorage.getItem('plate_load'))||663;
+  let width=parseFloat(localStorage.getItem('plate_width'))||31.6;
+  let thick=parseFloat(localStorage.getItem('plate_thick'))||2.5;
+  let model=localStorage.getItem('plate_model')||'lockingplate1.gltf';
+  let pname='Standard Volar Plate';
+  if(model.includes('lockingplate2'))pname='Juxta-Articular Plate';
+  else if(model.includes('lockingplate3'))pname='Narrow Shaft Plate';
+  document.getElementById('repGender').innerText=gender;
+  document.getElementById('repMass').innerText=mass;
+  document.getElementById('repMultiplier').innerText=load;
+  document.getElementById('repModel').innerText=pname;
+  document.getElementById('repWidth').innerText=width.toFixed(1);
+  document.getElementById('repThick').innerText=thick.toFixed(1);
+  const key=getKey(model);
+  const fd=FEA_DATA[key][load];
+  document.getElementById('repFeaBase').innerText=fd.deform+' mm @ '+load+'N';
+  const td=Math.pow(BASE_THICK/thick,3);
+  const ts=Math.pow(BASE_THICK/thick,2);
+  let disp=fd.deform*td;
+  let stress=fd.stress*ts;
+  let pres=fd.pressure;
+  document.getElementById('repDisp').innerText=disp.toFixed(5);
+  document.getElementById('repPressure').innerText=pres.toFixed(2);
+  document.getElementById('repStress').innerText=stress.toFixed(1);
+  // Math section
+  document.getElementById('repMathMass').innerText=load+' N (Table 10)';
+  document.getElementById('repMathMult').innerText='Direct FEA';
+  document.getElementById('repMathForce').innerText=fd.deform+' mm';
+  document.getElementById('repMathForce2').innerText='('+load+' N load)';
+  document.getElementById('repMathThick').innerText=thick.toFixed(1);
+  document.getElementById('repMathScalar').innerText=td.toFixed(3);
+  document.getElementById('repMathScalar2').innerText=td.toFixed(3);
+  document.getElementById('repMathBase').innerText=fd.deform;
+  document.getElementById('repMathFinal').innerText=disp.toFixed(5);
+  const card=document.getElementById('repCard');
+  const lbl=document.getElementById('repStatusLabel');
+  const desc=document.getElementById('repStatusDesc');
+  if(disp<=1.0){
+    card.style.cssText="border:2px solid #10b981;background:rgba(16,185,129,0.08);border-radius:16px;padding:16px;margin-bottom:16px";
+    lbl.innerHTML='<span style="color:#34d399">✓ CLEARED: Optimal Callus Formation</span>';
+    desc.innerText="Construct mechanical clearance is fully viable. Fracture gap has controlled micromotion highly conducive to biological healing.";
+  }else if(disp<=2.0){
+    card.style.cssText="border:2px solid #f59e0b;background:rgba(245,158,11,0.08);border-radius:16px;padding:16px;margin-bottom:16px";
+    lbl.innerHTML='<span style="color:#fbbf24">⚠ BORDERLINE: Caution Advised</span>';
+    desc.innerText="Displacement is elevated. Biologically viable, but post-surgical rehabilitation loading must be highly restricted.";
+  }else{
+    card.style.cssText="border:2px solid #ef4444;background:rgba(239,68,68,0.08);border-radius:16px;padding:16px;margin-bottom:16px";
+    lbl.innerHTML='<span style="color:#f87171">❌ WARNING: Non-Union Risk</span>';
+    desc.innerText="Calculated displacement breaches the 2.0mm threshold. Mechanical shear forces undermine secondary bone healing. Plate must be reinforced.";
+  }
+};
+</script>
+</body></html>
